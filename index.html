@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>日本地理マスター Ver.8</title>
+<title>日本地理マスター Ver.9</title>
 <style>
 :root {
   --main:#08a6a0; --main2:#6ed2cf; --bg:#eefafa; --card:#ffffff;
@@ -144,6 +144,32 @@ button.pulse {
   margin-top:6px;
 }
 
+
+.answerListBox {
+  display:none;
+  margin-top:12px;
+}
+.answerListBox.show {
+  display:block;
+}
+.footerControls {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:10px;
+}
+.noticeBox {
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  color:#7c2d12;
+  border-radius:14px;
+  padding:10px 12px;
+  font-size:13px;
+  line-height:1.6;
+  margin-top:10px;
+}
+
 @media(max-width:850px) {
   main { padding:10px; } .topGrid { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,1fr); }
   #question { font-size:25px; } #map { min-height:460px; justify-content:flex-start; }
@@ -152,7 +178,7 @@ button.pulse {
 </style>
 </head>
 <body>
-<header><h1>👑 日本地理マスター Ver.8.1</h1></header>
+<header><h1>👑 日本地理マスター Ver.9.1</h1></header>
 <main>
   <section class="card topGrid">
     <div>
@@ -174,7 +200,7 @@ button.pulse {
         <button class="soft" id="soundBtn">🔊 音ON</button>
       </div>
       <div id="question">「クイズ」を押してね</div>
-      <div id="message">Ver.8：地方区分モードを追加。</div>
+      <div id="message">Ver.9：一覧を折りたたみ式に変更。</div>
       <div class="progressWrap">
         <div class="progressText" id="progressText">進み具合：未開始</div>
         <div class="progressBar"><div id="progressFill"></div></div>
@@ -218,7 +244,15 @@ button.pulse {
 
   <section class="card">
     <p class="small">使用地図：Geolonia Japanese Prefectures SVG。都道府県ごとのSVG要素をクリック判定に使っています。</p>
-    <div class="list" id="prefList"></div>
+    <div class="footerControls">
+      <button class="soft" id="toggleListBtn">📚 一覧を表示</button>
+    </div>
+    <div class="noticeBox">
+      クイズ中のネタバレ防止のため、一覧は最初は非表示です。学習したい時だけ開いてください。
+    </div>
+    <div class="answerListBox" id="answerListBox">
+      <div class="list" id="prefList"></div>
+    </div>
   </section>
 </main>
 
@@ -755,12 +789,30 @@ async function loadMap() {
 }
 function renderList() {
   const list = document.getElementById("prefList");
+  if (!list) return;
   list.innerHTML = "";
+
+  if (quizType === "region") {
+    REGIONS.forEach(regionName => {
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      const count = Object.values(PREFS).filter(data => data[1] === regionName).length;
+      chip.textContent = regionName + "地方｜" + count + "都道府県";
+      list.appendChild(chip);
+    });
+    return;
+  }
+
   Object.entries(PREFS).forEach(([code, data]) => {
     const chip = document.createElement("div");
     chip.className = "chip" + (weak.has(code) ? " weakChip" : "");
     const add = weak.has(code) ? " 🧠" + (weakWins[code] ? " " + weakWins[code] + "/3" : "") : "";
-    chip.textContent = data[0] + "｜" + data[2] + add;
+
+    if (quizType === "capital") {
+      chip.textContent = data[2] + add;
+    } else {
+      chip.textContent = data[0] + add;
+    }
     list.appendChild(chip);
   });
 }
@@ -780,6 +832,14 @@ function setQuizType(type) {
     btn.classList.toggle("primary", type === val);
     btn.classList.toggle("soft", type !== val);
   });
+  renderList();
+  const box = document.getElementById("answerListBox");
+  const btn = document.getElementById("toggleListBtn");
+  if (box && box.classList.contains("show")) {
+    box.classList.remove("show");
+    if (btn) btn.textContent = "📚 一覧を表示";
+  }
+
   if (mode !== "learn") {
     mode = "quiz";
     used = new Set();
@@ -839,6 +899,14 @@ document.getElementById("closeFinish").addEventListener("click", () => {
   resultPanel.classList.remove("show");
   renderList();
 });
+document.getElementById("toggleListBtn").addEventListener("click", () => {
+  const box = document.getElementById("answerListBox");
+  const btn = document.getElementById("toggleListBtn");
+  box.classList.toggle("show");
+  btn.textContent = box.classList.contains("show") ? "📕 一覧を隠す" : "📚 一覧を表示";
+  renderList();
+});
+
 updateStats();
 updateProgress();
 renderList();
