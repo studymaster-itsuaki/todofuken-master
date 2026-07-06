@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>日本地理マスター Ver.7.1</title>
+<title>日本地理マスター Ver.8</title>
 <style>
 :root {
   --main:#08a6a0; --main2:#6ed2cf; --bg:#eefafa; --card:#ffffff;
@@ -65,6 +65,8 @@ select { background:white; border:1px solid #d0e4e5; min-width:150px; }
 .geolonia-svg-map .prefecture.correct { fill:#86efac !important; }
 .geolonia-svg-map .prefecture.wrong { fill:#fca5a5 !important; }
 .geolonia-svg-map .prefecture.learn { fill:#fef3c7 !important; }
+.geolonia-svg-map .prefecture.regionSelected { fill:#bfdbfe !important; }
+.geolonia-svg-map .prefecture.regionDone { fill:#86efac !important; }
 .resultPanel {
   position:absolute; right:26px; bottom:28px; width:min(340px, calc(100% - 52px));
   background:white; border-radius:22px; box-shadow:0 8px 28px rgba(0,0,0,.18);
@@ -150,13 +152,14 @@ button.pulse {
 </style>
 </head>
 <body>
-<header><h1>👑 日本地理マスター Ver.7.1.1</h1></header>
+<header><h1>👑 日本地理マスター Ver.8.1</h1></header>
 <main>
   <section class="card topGrid">
     <div>
       <div class="controls">
         <button class="primary" id="prefModeBtn">🗾 都道府県</button>
         <button class="soft" id="capitalModeBtn">🏙 県庁所在地</button>
+        <button class="soft" id="regionModeBtn">🧭 地方区分</button>
         <select id="region">
           <option>全国</option><option>北海道</option><option>東北</option><option>関東</option>
           <option>中部</option><option>近畿</option><option>中国</option><option>四国</option><option>九州・沖縄</option>
@@ -171,7 +174,7 @@ button.pulse {
         <button class="soft" id="soundBtn">🔊 音ON</button>
       </div>
       <div id="question">「クイズ」を押してね</div>
-      <div id="message">Ver.7.1：県庁所在地モードを追加。</div>
+      <div id="message">Ver.8：地方区分モードを追加。</div>
       <div class="progressWrap">
         <div class="progressText" id="progressText">進み具合：未開始</div>
         <div class="progressBar"><div id="progressFill"></div></div>
@@ -232,9 +235,12 @@ button.pulse {
 <script>
 const PREFS = {"1": ["北海道", "北海道", "札幌市", "ほっかいどう"], "2": ["青森県", "東北", "青森市", "あおもりけん"], "3": ["岩手県", "東北", "盛岡市", "いわてけん"], "4": ["宮城県", "東北", "仙台市", "みやぎけん"], "5": ["秋田県", "東北", "秋田市", "あきたけん"], "6": ["山形県", "東北", "山形市", "やまがたけん"], "7": ["福島県", "東北", "福島市", "ふくしまけん"], "8": ["茨城県", "関東", "水戸市", "いばらきけん"], "9": ["栃木県", "関東", "宇都宮市", "とちぎけん"], "10": ["群馬県", "関東", "前橋市", "ぐんまけん"], "11": ["埼玉県", "関東", "さいたま市", "さいたまけん"], "12": ["千葉県", "関東", "千葉市", "ちばけん"], "13": ["東京都", "関東", "新宿区", "とうきょうと"], "14": ["神奈川県", "関東", "横浜市", "かながわけん"], "15": ["新潟県", "中部", "新潟市", "にいがたけん"], "16": ["富山県", "中部", "富山市", "とやまけん"], "17": ["石川県", "中部", "金沢市", "いしかわけん"], "18": ["福井県", "中部", "福井市", "ふくいけん"], "19": ["山梨県", "中部", "甲府市", "やまなしけん"], "20": ["長野県", "中部", "長野市", "ながのけん"], "21": ["岐阜県", "中部", "岐阜市", "ぎふけん"], "22": ["静岡県", "中部", "静岡市", "しずおかけん"], "23": ["愛知県", "中部", "名古屋市", "あいちけん"], "24": ["三重県", "近畿", "津市", "みえけん"], "25": ["滋賀県", "近畿", "大津市", "しがけん"], "26": ["京都府", "近畿", "京都市", "きょうとふ"], "27": ["大阪府", "近畿", "大阪市", "おおさかふ"], "28": ["兵庫県", "近畿", "神戸市", "ひょうごけん"], "29": ["奈良県", "近畿", "奈良市", "ならけん"], "30": ["和歌山県", "近畿", "和歌山市", "わかやまけん"], "31": ["鳥取県", "中国", "鳥取市", "とっとりけん"], "32": ["島根県", "中国", "松江市", "しまねけん"], "33": ["岡山県", "中国", "岡山市", "おかやまけん"], "34": ["広島県", "中国", "広島市", "ひろしまけん"], "35": ["山口県", "中国", "山口市", "やまぐちけん"], "36": ["徳島県", "四国", "徳島市", "とくしまけん"], "37": ["香川県", "四国", "高松市", "かがわけん"], "38": ["愛媛県", "四国", "松山市", "えひめけん"], "39": ["高知県", "四国", "高知市", "こうちけん"], "40": ["福岡県", "九州・沖縄", "福岡市", "ふくおかけん"], "41": ["佐賀県", "九州・沖縄", "佐賀市", "さがけん"], "42": ["長崎県", "九州・沖縄", "長崎市", "ながさきけん"], "43": ["熊本県", "九州・沖縄", "熊本市", "くまもとけん"], "44": ["大分県", "九州・沖縄", "大分市", "おおいたけん"], "45": ["宮崎県", "九州・沖縄", "宮崎市", "みやざきけん"], "46": ["鹿児島県", "九州・沖縄", "鹿児島市", "かごしまけん"], "47": ["沖縄県", "九州・沖縄", "那覇市", "おきなわけん"]};
 const MAP_URL = "https://cdn.jsdelivr.net/gh/geolonia/japanese-prefectures@master/map-full.svg";
+const REGIONS = ["北海道","東北","関東","中部","近畿","中国","四国","九州・沖縄"];
 
 let mode = "home";
 let quizType = "prefecture";
+let currentRegion = null;
+let regionSelected = new Set();
 let currentCode = null;
 let used = new Set();
 let correct = Number(localStorage.getItem("tdfk5_correct") || 0);
@@ -415,7 +421,7 @@ function allPrefEls() {
 }
 function clearMarks(keepAnswers=false) {
   allPrefEls().forEach(el => {
-    el.classList.remove("learn");
+    el.classList.remove("learn", "regionSelected", "regionDone");
     if (!keepAnswers) el.classList.remove("correct", "wrong");
   });
 }
@@ -489,6 +495,18 @@ function pickQuestion() {
 
   currentCode = pool[Math.floor(Math.random() * pool.length)];
   used.add(currentCode);
+  if (quizType === "region") {
+    currentRegion = REGIONS[Math.floor(Math.random() * REGIONS.length)];
+    regionSelected = new Set();
+    currentCode = null;
+    question.textContent = "「" + currentRegion + "地方」を全部クリックしよう";
+    const count = Object.values(PREFS).filter(data => data[1] === currentRegion).length;
+    message.textContent = currentRegion + "地方は " + count + " 都道府県あります。";
+    message.className = "";
+    updateProgressRegion();
+    return;
+  }
+
   const data = PREFS[currentCode];
   if (quizType === "capital") {
     question.textContent = "「" + data[2] + "」が県庁所在地なのはどこ？";
@@ -516,7 +534,73 @@ function showResult(isCorrect, clickedCode, graduateMsg="") {
   document.getElementById("graduateText").textContent = graduateMsg;
   resultPanel.classList.add("show");
 }
+
+function updateProgressRegion() {
+  if (quizType !== "region" || !currentRegion) return;
+  const need = Object.entries(PREFS).filter(([code, data]) => data[1] === currentRegion).map(([code]) => code);
+  const remaining = need.filter(code => !regionSelected.has(code)).length;
+  message.textContent = currentRegion + "地方：あと " + remaining + " 県";
+}
+function answerRegion(code, el) {
+  if (!currentRegion) {
+    question.textContent = "先に地方区分モードを始めてね";
+    return;
+  }
+  const data = PREFS[code];
+  total += 1;
+  if (data[1] === currentRegion) {
+    if (!regionSelected.has(code)) {
+      correct += 1;
+      streak += 1;
+      regionSelected.add(code);
+      el.classList.add("regionSelected");
+      animateEl(el, "pop");
+      beep("ok");
+      message.textContent = "○ " + data[0] + " は " + currentRegion + "地方！";
+      message.className = "okText";
+    }
+    const need = Object.entries(PREFS).filter(([c, d]) => d[1] === currentRegion).map(([c]) => c);
+    const done = need.every(c => regionSelected.has(c));
+    if (done) {
+      need.forEach(c => {
+        const area = document.querySelector('.geolonia-svg-map .prefecture[data-code="' + Number(c) + '"]');
+        if (area) area.classList.add("regionDone");
+      });
+      message.textContent = "🎉 " + currentRegion + "地方を全部選べた！";
+      showRegionResult();
+      beep("finish");
+      confetti();
+    } else {
+      updateProgressRegion();
+    }
+  } else {
+    streak = 0;
+    weak.add(code);
+    el.classList.add("wrong");
+    animateEl(el, "shake");
+    beep("ng");
+    message.textContent = "× " + data[0] + " は " + data[1] + "地方です。";
+    message.className = "ngText";
+  }
+  save();
+  updateStats();
+}
+function showRegionResult() {
+  document.getElementById("resultTitle").textContent = "✨ 地方区分クリア！";
+  document.getElementById("resultTitle").className = "okText";
+  document.getElementById("resultSub").textContent = "ここが";
+  document.getElementById("resultName").textContent = currentRegion + "地方";
+  const names = Object.values(PREFS).filter(data => data[1] === currentRegion).map(data => data[0]).join("・");
+  document.getElementById("resultInfo").textContent = names;
+  document.getElementById("graduateText").textContent = "";
+  resultPanel.classList.add("show");
+}
+
 function answer(code, el) {
+  if (quizType === "region" && mode !== "learn") {
+    answerRegion(code, el);
+    return;
+  }
   if (mode === "learn") {
     resultPanel.classList.remove("show");
     clearMarks();
@@ -683,12 +767,19 @@ function renderList() {
 
 function setQuizType(type) {
   quizType = type;
-  document.getElementById("prefModeBtn").classList.toggle("modeOn", type === "prefecture");
-  document.getElementById("capitalModeBtn").classList.toggle("modeOn", type === "capital");
-  document.getElementById("prefModeBtn").classList.toggle("primary", type === "prefecture");
-  document.getElementById("prefModeBtn").classList.toggle("soft", type !== "prefecture");
-  document.getElementById("capitalModeBtn").classList.toggle("primary", type === "capital");
-  document.getElementById("capitalModeBtn").classList.toggle("soft", type !== "capital");
+  currentRegion = null;
+  regionSelected = new Set();
+  const ids = [
+    ["prefModeBtn", "prefecture"],
+    ["capitalModeBtn", "capital"],
+    ["regionModeBtn", "region"]
+  ];
+  ids.forEach(([id, val]) => {
+    const btn = document.getElementById(id);
+    btn.classList.toggle("modeOn", type === val);
+    btn.classList.toggle("primary", type === val);
+    btn.classList.toggle("soft", type !== val);
+  });
   if (mode !== "learn") {
     mode = "quiz";
     used = new Set();
@@ -696,11 +787,12 @@ function setQuizType(type) {
     clearMarks();
     pickQuestion();
   } else {
-    question.textContent = type === "capital" ? "県をクリックして県庁所在地を確認" : "地図の県をクリックして確認";
+    question.textContent = type === "capital" ? "県をクリックして県庁所在地を確認" : type === "region" ? "地方区分を確認できます" : "地図の県をクリックして確認";
   }
 }
 document.getElementById("prefModeBtn").addEventListener("click", () => setQuizType("prefecture"));
 document.getElementById("capitalModeBtn").addEventListener("click", () => setQuizType("capital"));
+document.getElementById("regionModeBtn").addEventListener("click", () => setQuizType("region"));
 
 document.getElementById("startBtn").addEventListener("click", () => {
   mode = "quiz"; challengeActive = false; timeAttack = false; used = new Set(); stopTimer(); document.getElementById("timerText").textContent="";
@@ -720,7 +812,7 @@ document.getElementById("weakBtn").addEventListener("click", () => {
   mode = "weak"; challengeActive = false; timeAttack = false; used = new Set(); stopTimer(); document.getElementById("timerText").textContent="";
   message.className = ""; clearMarks(); updateProgress(); pickQuestion();
 });
-document.getElementById("nextBtn").addEventListener("click", pickQuestion);
+document.getElementById("nextBtn").addEventListener("click", () => { clearMarks(); resultPanel.classList.remove("show"); pickQuestion(); });
 document.getElementById("region").addEventListener("change", () => {
   if (mode !== "learn") { mode = "quiz"; challengeActive = false; timeAttack = false; used = new Set(); stopTimer(); document.getElementById("timerText").textContent="";
   message.className = ""; clearMarks(); updateProgress(); pickQuestion(); }
