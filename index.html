@@ -146,126 +146,27 @@ button.pulse {
 
 
 
-.landformMap {
-  width:100%;
-  min-height:560px;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,#f8ffff,#effafa);
-  border-radius:18px;
-  border:1px solid #d9eeee;
-  overflow:auto;
-  padding:12px;
-}
-.landformMap.show {
-  display:flex;
-}
-.landformMap svg {
-  width:min(100%, 900px);
-  height:auto;
-  max-height:82vh;
-  min-width:620px;
-}
-#map.hideMap {
-  display:none;
-}
-.landBase {
-  fill:#fff;
-  stroke:#64748b;
-  stroke-width:2;
-}
-.landformFeature {
-  cursor:pointer;
-  transition:filter .15s ease, opacity .15s ease;
-}
-.landformFeature:hover {
-  filter:drop-shadow(0 3px 5px rgba(0,0,0,.25));
-}
-.landformFeature.correct .featureShape {
-  stroke:#15803d !important;
-  fill:#86efac !important;
-}
-.landformFeature.wrong .featureShape {
-  stroke:#b91c1c !important;
-  fill:#fca5a5 !important;
-}
-.landformFeature.learn .featureShape {
-  stroke:#a16207 !important;
-  fill:#fde68a !important;
-}
-.featurePlain {
-  fill:rgba(34,197,94,.28);
-  stroke:#16a34a;
-  stroke-width:3;
-}
-.featureMountain {
-  fill:rgba(120,113,108,.30);
-  stroke:#57534e;
-  stroke-width:3;
-}
-.featureRiver {
-  fill:none;
-  stroke:#2563eb;
-  stroke-width:8;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-}
-.featureRiverHit {
-  fill:none;
-  stroke:transparent;
-  stroke-width:24;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-  pointer-events:stroke;
-}
-.landLabel {
-  font-size:17px;
-  font-weight:900;
-  fill:#334155;
-  paint-order:stroke;
-  stroke:#fff;
-  stroke-width:5px;
-  stroke-linejoin:round;
-  display:none;
-  pointer-events:none;
-}
-.landformFeature.correct .landLabel,
-.landformFeature.wrong .landLabel,
-.landformFeature.learn .landLabel {
-  display:block;
-}
-.landformLegend {
-  display:none;
-  gap:12px;
-  flex-wrap:wrap;
-  font-size:14px;
-  color:var(--muted);
-  margin-bottom:8px;
-}
-.landformLegend.show {
-  display:flex;
-}
-.lgBox {
-  display:inline-block;
-  width:18px;
-  height:12px;
-  border-radius:5px;
-  vertical-align:-1px;
-  margin-right:4px;
-}
-.lgPlain { background:#bbf7d0; border:1px solid #16a34a; }
-.lgRiver { background:#bfdbfe; border:1px solid #2563eb; }
-.lgMountain { background:#d6d3d1; border:1px solid #57534e; }
-.landformInfo {
-  background:#f8fafc;
-  border:1px solid #e2e8f0;
-  border-radius:14px;
-  padding:10px 12px;
-  font-size:13px;
-  color:#475569;
-  margin-top:10px;
-}
+#map { position:relative; }
+.landformLayer{position:absolute;inset:12px;pointer-events:none;z-index:8;display:none}
+.landformLayer.show{display:block}
+.landformSvg{width:min(100%,880px);height:auto;max-height:82vh;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);overflow:visible}
+.landformTarget{pointer-events:auto;cursor:pointer;transition:filter .15s ease,opacity .15s ease}
+.landformTarget:hover{filter:drop-shadow(0 2px 5px rgba(0,0,0,.25))}
+.landformShape{opacity:.72}
+.landformTarget.correct .landformShape{stroke:#15803d!important;fill:#86efac!important;opacity:.88}
+.landformTarget.wrong .landformShape{stroke:#b91c1c!important;fill:#fca5a5!important;opacity:.88}
+.landformTarget.learn .landformShape{stroke:#a16207!important;fill:#fde68a!important;opacity:.88}
+.landformPlain{fill:#bbf7d0;stroke:#16a34a;stroke-width:6}
+.landformMountain{fill:#d6d3d1;stroke:#57534e;stroke-width:6}
+.landformRiver{fill:none;stroke:#2563eb;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+.landformRiverHit{fill:none;stroke:transparent;stroke-width:28;stroke-linecap:round;stroke-linejoin:round;pointer-events:stroke}
+.landformLabel{display:none;font-size:18px;font-weight:900;fill:#1e293b;paint-order:stroke;stroke:#fff;stroke-width:6px;stroke-linejoin:round;pointer-events:none}
+.landformTarget.correct .landformLabel,.landformTarget.wrong .landformLabel,.landformTarget.learn .landformLabel{display:block}
+.landformLegend{display:none;gap:12px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin-bottom:8px}
+.landformLegend.show{display:flex}
+.lgBox{display:inline-block;width:18px;height:12px;border-radius:5px;vertical-align:-1px;margin-right:4px}
+.lgPlain{background:#bbf7d0;border:1px solid #16a34a}.lgRiver{background:#bfdbfe;border:1px solid #2563eb}.lgMountain{background:#d6d3d1;border:1px solid #57534e}
+@media(max-width:850px){.landformSvg{min-width:620px;left:12px;top:12px;transform:none}}
 
 .answerListBox {
   display:none;
@@ -323,7 +224,7 @@ button.pulse {
         <button class="soft" id="soundBtn">🔊 音ON</button>
       </div>
       <div id="question">「クイズ」を押してね</div>
-      <div id="message">Ver.10：自然地形専用マップを追加。</div>
+      <div id="message">Ver.10：自然地形モードを追加。</div>
       <div class="progressWrap">
         <div class="progressText" id="progressText">進み具合：未開始</div>
         <div class="progressBar"><div id="progressFill"></div></div>
@@ -354,110 +255,32 @@ button.pulse {
       <span><i class="dot learn"></i>学習モードで選択中</span>
       <span class="timerBig" id="timerText"></span>
     </div>
-    <div id="map"><div class="loading">地図を読み込み中...</div></div>
+    <div id="map"><div class="loading">地図を読み込み中...</div>
+      <div id="landformLayer" class="landformLayer">
+        <svg class="landformSvg" viewBox="0 0 900 900" aria-label="自然地形レイヤー">
+          <g class="landformTarget" data-id="ishikari_plain"><ellipse class="landformShape landformPlain" cx="690" cy="165" rx="44" ry="24" transform="rotate(-22 690 165)"></ellipse><text class="landformLabel" x="690" y="170" text-anchor="middle">石狩平野</text></g>
+          <g class="landformTarget" data-id="tokachi_plain"><ellipse class="landformShape landformPlain" cx="750" cy="250" rx="45" ry="24" transform="rotate(16 750 250)"></ellipse><text class="landformLabel" x="750" y="255" text-anchor="middle">十勝平野</text></g>
+          <g class="landformTarget" data-id="kanto_plain"><ellipse class="landformShape landformPlain" cx="585" cy="565" rx="52" ry="36" transform="rotate(5 585 565)"></ellipse><text class="landformLabel" x="585" y="570" text-anchor="middle">関東平野</text></g>
+          <g class="landformTarget" data-id="nobi_plain"><ellipse class="landformShape landformPlain" cx="485" cy="660" rx="40" ry="24" transform="rotate(6 485 660)"></ellipse><text class="landformLabel" x="485" y="665" text-anchor="middle">濃尾平野</text></g>
+          <g class="landformTarget" data-id="osaka_plain"><ellipse class="landformShape landformPlain" cx="410" cy="705" rx="34" ry="22" transform="rotate(8 410 705)"></ellipse><text class="landformLabel" x="410" y="710" text-anchor="middle">大阪平野</text></g>
+          <g class="landformTarget" data-id="tsukushi_plain"><ellipse class="landformShape landformPlain" cx="150" cy="765" rx="44" ry="24" transform="rotate(5 150 765)"></ellipse><text class="landformLabel" x="150" y="770" text-anchor="middle">筑紫平野</text></g>
 
-    <div id="landformMap" class="landformMap">
-      <svg viewBox="0 0 900 760" role="img" aria-label="小4向け自然地形マップ">
-        <rect x="0" y="0" width="900" height="760" fill="#f8ffff"></rect>
+          <g class="landformTarget" data-id="ouu_mountains"><path class="landformShape landformMountain" d="M600 315 C585 385 588 455 570 530 C562 570 555 615 535 660 L510 652 C528 595 535 545 545 495 C558 425 560 360 580 305 Z"></path><text class="landformLabel" x="558" y="495" text-anchor="middle">奥羽山脈</text></g>
+          <g class="landformTarget" data-id="japan_alps"><path class="landformShape landformMountain" d="M455 555 C500 590 520 650 505 720 C493 770 455 815 405 835 L385 812 C425 780 445 735 450 690 C456 635 430 595 410 565 Z"></path><text class="landformLabel" x="455" y="695" text-anchor="middle">日本アルプス</text></g>
+          <g class="landformTarget" data-id="chugoku_mountains"><path class="landformShape landformMountain" d="M220 690 C285 678 350 690 405 720 L392 752 C325 730 270 728 210 738 Z"></path><text class="landformLabel" x="305" y="720" text-anchor="middle">中国山地</text></g>
+          <g class="landformTarget" data-id="shikoku_mountains"><path class="landformShape landformMountain" d="M220 760 C280 766 335 775 375 805 L358 835 C305 810 260 800 205 800 Z"></path><text class="landformLabel" x="290" y="805" text-anchor="middle">四国山地</text></g>
+          <g class="landformTarget" data-id="kyushu_mountains"><path class="landformShape landformMountain" d="M120 735 C162 770 175 825 150 875 L118 862 C135 820 120 780 92 755 Z"></path><text class="landformLabel" x="130" y="812" text-anchor="middle">九州山地</text></g>
 
-        <!-- simplified Japan base map, original schematic -->
-        <path class="landBase" d="M650 65 C720 80 780 120 800 180 C820 245 790 295 735 300 C675 305 625 275 590 230 C555 185 570 105 650 65 Z"/>
-        <path class="landBase" d="M570 260 C610 305 625 360 610 410 C595 470 555 510 525 575 C500 630 450 665 390 640 C335 618 310 565 335 515 C360 465 400 440 420 390 C445 330 505 260 570 260 Z"/>
-        <path class="landBase" d="M305 500 C345 520 360 560 340 595 C320 635 275 655 230 640 C185 625 170 590 190 555 C210 520 260 490 305 500 Z"/>
-        <path class="landBase" d="M205 555 C235 590 225 655 175 690 C125 725 70 705 55 650 C42 600 75 555 125 540 C155 530 182 535 205 555 Z"/>
-        <ellipse class="landBase" cx="735" cy="600" rx="45" ry="22"/>
-
-        <!-- plains -->
-        <g class="landformFeature" data-id="ishikari_plain">
-          <ellipse class="featureShape featurePlain" cx="675" cy="165" rx="45" ry="24"/>
-          <text class="landLabel" x="675" y="170" text-anchor="middle">石狩平野</text>
-        </g>
-        <g class="landformFeature" data-id="tokachi_plain">
-          <ellipse class="featureShape featurePlain" cx="745" cy="225" rx="48" ry="24" transform="rotate(20 745 225)"/>
-          <text class="landLabel" x="745" y="230" text-anchor="middle">十勝平野</text>
-        </g>
-        <g class="landformFeature" data-id="kanto_plain">
-          <ellipse class="featureShape featurePlain" cx="555" cy="435" rx="58" ry="38"/>
-          <text class="landLabel" x="555" y="440" text-anchor="middle">関東平野</text>
-        </g>
-        <g class="landformFeature" data-id="nobi_plain">
-          <ellipse class="featureShape featurePlain" cx="470" cy="510" rx="44" ry="24"/>
-          <text class="landLabel" x="470" y="515" text-anchor="middle">濃尾平野</text>
-        </g>
-        <g class="landformFeature" data-id="osaka_plain">
-          <ellipse class="featureShape featurePlain" cx="390" cy="565" rx="36" ry="22"/>
-          <text class="landLabel" x="390" y="570" text-anchor="middle">大阪平野</text>
-        </g>
-        <g class="landformFeature" data-id="tsukushi_plain">
-          <ellipse class="featureShape featurePlain" cx="145" cy="610" rx="46" ry="24"/>
-          <text class="landLabel" x="145" y="615" text-anchor="middle">筑紫平野</text>
-        </g>
-
-        <!-- mountains -->
-        <g class="landformFeature" data-id="ouu_mountains">
-          <path class="featureShape featureMountain" d="M620 275 C600 325 600 375 585 430 C575 470 570 505 552 540 L535 535 C548 485 555 445 565 405 C578 355 580 310 603 268 Z"/>
-          <text class="landLabel" x="590" y="395" text-anchor="middle">奥羽山脈</text>
-        </g>
-        <g class="landformFeature" data-id="japan_alps">
-          <path class="featureShape featureMountain" d="M455 405 C485 430 500 470 492 520 C485 565 462 600 425 620 L408 600 C435 575 450 540 454 505 C458 465 442 435 428 415 Z"/>
-          <text class="landLabel" x="457" y="520" text-anchor="middle">日本アルプス</text>
-        </g>
-        <g class="landformFeature" data-id="chugoku_mountains">
-          <path class="featureShape featureMountain" d="M230 535 C285 525 330 535 375 560 L365 585 C310 570 270 565 220 575 Z"/>
-          <text class="landLabel" x="300" y="565" text-anchor="middle">中国山地</text>
-        </g>
-        <g class="landformFeature" data-id="shikoku_mountains">
-          <path class="featureShape featureMountain" d="M215 575 C260 585 300 590 330 612 L318 635 C275 618 240 610 200 608 Z"/>
-          <text class="landLabel" x="265" y="610" text-anchor="middle">四国山地</text>
-        </g>
-        <g class="landformFeature" data-id="kyushu_mountains">
-          <path class="featureShape featureMountain" d="M122 565 C155 595 168 640 152 685 L125 675 C135 640 124 605 98 582 Z"/>
-          <text class="landLabel" x="130" y="635" text-anchor="middle">九州山地</text>
-        </g>
-
-        <!-- rivers: transparent hit stroke first, visible stroke second -->
-        <g class="landformFeature" data-id="ishikari_river">
-          <path class="featureRiverHit" d="M720 125 C690 145 670 175 645 200 C625 220 605 230 585 238"/>
-          <path class="featureShape featureRiver" d="M720 125 C690 145 670 175 645 200 C625 220 605 230 585 238"/>
-          <text class="landLabel" x="650" y="205" text-anchor="middle">石狩川</text>
-        </g>
-        <g class="landformFeature" data-id="tone_river">
-          <path class="featureRiverHit" d="M510 395 C535 418 570 425 612 420"/>
-          <path class="featureShape featureRiver" d="M510 395 C535 418 570 425 612 420"/>
-          <text class="landLabel" x="560" y="405" text-anchor="middle">利根川</text>
-        </g>
-        <g class="landformFeature" data-id="shinano_river">
-          <path class="featureRiverHit" d="M500 355 C480 385 465 420 450 455 C438 485 430 510 420 535"/>
-          <path class="featureShape featureRiver" d="M500 355 C480 385 465 420 450 455 C438 485 430 510 420 535"/>
-          <text class="landLabel" x="465" y="455" text-anchor="middle">信濃川</text>
-        </g>
-        <g class="landformFeature" data-id="kiso_river">
-          <path class="featureRiverHit" d="M455 470 C460 495 465 520 475 545"/>
-          <path class="featureShape featureRiver" d="M455 470 C460 495 465 520 475 545"/>
-          <text class="landLabel" x="465" y="520" text-anchor="middle">木曽川</text>
-        </g>
-        <g class="landformFeature" data-id="yodo_river">
-          <path class="featureRiverHit" d="M430 535 C410 548 392 558 370 565"/>
-          <path class="featureShape featureRiver" d="M430 535 C410 548 392 558 370 565"/>
-          <text class="landLabel" x="400" y="548" text-anchor="middle">淀川</text>
-        </g>
-        <g class="landformFeature" data-id="yoshino_river">
-          <path class="featureRiverHit" d="M210 595 C248 600 292 600 330 590"/>
-          <path class="featureShape featureRiver" d="M210 595 C248 600 292 600 330 590"/>
-          <text class="landLabel" x="270" y="590" text-anchor="middle">吉野川</text>
-        </g>
-        <g class="landformFeature" data-id="chikugo_river">
-          <path class="featureRiverHit" d="M180 585 C155 600 128 610 95 610"/>
-          <path class="featureShape featureRiver" d="M180 585 C155 600 128 610 95 610"/>
-          <text class="landLabel" x="135" y="600" text-anchor="middle">筑後川</text>
-        </g>
-
-        <text x="450" y="735" text-anchor="middle" font-size="18" fill="#64748b" font-weight="700">
-          小4向け自然地形マップ（位置は学習用の目安）
-        </text>
-      </svg>
-    </div>
-
+          <g class="landformTarget" data-id="ishikari_river"><path class="landformRiverHit" d="M725 120 C690 150 668 188 638 215 C612 240 585 250 560 258"></path><path class="landformShape landformRiver" d="M725 120 C690 150 668 188 638 215 C612 240 585 250 560 258"></path><text class="landformLabel" x="638" y="218" text-anchor="middle">石狩川</text></g>
+          <g class="landformTarget" data-id="tone_river"><path class="landformRiverHit" d="M535 520 C560 545 598 555 650 548"></path><path class="landformShape landformRiver" d="M535 520 C560 545 598 555 650 548"></path><text class="landformLabel" x="595" y="535" text-anchor="middle">利根川</text></g>
+          <g class="landformTarget" data-id="shinano_river"><path class="landformRiverHit" d="M505 455 C480 500 460 550 438 610 C420 660 398 710 372 760"></path><path class="landformShape landformRiver" d="M505 455 C480 500 460 550 438 610 C420 660 398 710 372 760"></path><text class="landformLabel" x="440" y="610" text-anchor="middle">信濃川</text></g>
+          <g class="landformTarget" data-id="kiso_river"><path class="landformRiverHit" d="M455 610 C465 650 472 695 485 735"></path><path class="landformShape landformRiver" d="M455 610 C465 650 472 695 485 735"></path><text class="landformLabel" x="470" y="690" text-anchor="middle">木曽川</text></g>
+          <g class="landformTarget" data-id="yodo_river"><path class="landformRiverHit" d="M450 680 C425 695 402 705 372 712"></path><path class="landformShape landformRiver" d="M450 680 C425 695 402 705 372 712"></path><text class="landformLabel" x="410" y="695" text-anchor="middle">淀川</text></g>
+          <g class="landformTarget" data-id="yoshino_river"><path class="landformRiverHit" d="M210 780 C265 788 320 786 380 775"></path><path class="landformShape landformRiver" d="M210 780 C265 788 320 786 380 775"></path><text class="landformLabel" x="295" y="772" text-anchor="middle">吉野川</text></g>
+          <g class="landformTarget" data-id="chikugo_river"><path class="landformRiverHit" d="M190 730 C162 748 125 760 85 760"></path><path class="landformShape landformRiver" d="M190 730 C162 748 125 760 85 760"></path><text class="landformLabel" x="135" y="748" text-anchor="middle">筑後川</text></g>
+        </svg>
+      </div>
+</div>
     <div class="resultPanel" id="resultPanel">
       <h2 id="resultTitle">正解！</h2>
       <div id="resultSub">ここは</div>
@@ -474,7 +297,7 @@ button.pulse {
       <button class="soft" id="toggleListBtn">📚 一覧を表示</button>
     </div>
     <div class="noticeBox">
-      クイズ中のネタバレ防止のため、一覧は最初は非表示です。自然地形モードでは専用の学習用地図に切り替わります。
+      クイズ中のネタバレ防止のため、一覧は最初は非表示です。自然地形はいつもの日本地図に色付きで重ねています。
     </div>
     <div class="answerListBox" id="answerListBox">
       <div class="list" id="prefList"></div>
@@ -497,24 +320,24 @@ const PREFS = {"1": ["北海道", "北海道", "札幌市", "ほっかいどう"
 const MAP_URL = "https://cdn.jsdelivr.net/gh/geolonia/japanese-prefectures@master/map-full.svg";
 const REGIONS = ["北海道","東北","関東","中部","近畿","中国","四国","九州・沖縄"];
 const LANDFORMS = [
-  {id:"ishikari_plain", type:"plain", name:"石狩平野", yomi:"いしかりへいや", hint:"北海道の西側に広がる平野"},
-  {id:"tokachi_plain", type:"plain", name:"十勝平野", yomi:"とかちへいや", hint:"北海道の南東部に広がる平野"},
-  {id:"kanto_plain", type:"plain", name:"関東平野", yomi:"かんとうへいや", hint:"日本で最も広い平野"},
-  {id:"nobi_plain", type:"plain", name:"濃尾平野", yomi:"のうびへいや", hint:"木曽三川の下流に広がる平野"},
-  {id:"osaka_plain", type:"plain", name:"大阪平野", yomi:"おおさかへいや", hint:"大阪湾に面した平野"},
-  {id:"tsukushi_plain", type:"plain", name:"筑紫平野", yomi:"つくしへいや", hint:"九州北部にある平野"},
-  {id:"ishikari_river", type:"river", name:"石狩川", yomi:"いしかりがわ", hint:"北海道を流れる川"},
-  {id:"tone_river", type:"river", name:"利根川", yomi:"とねがわ", hint:"関東平野を流れる川"},
-  {id:"shinano_river", type:"river", name:"信濃川", yomi:"しなのがわ", hint:"日本で一番長い川"},
-  {id:"kiso_river", type:"river", name:"木曽川", yomi:"きそがわ", hint:"濃尾平野を流れる木曽三川の一つ"},
-  {id:"yodo_river", type:"river", name:"淀川", yomi:"よどがわ", hint:"琵琶湖から大阪湾へ流れる川"},
-  {id:"yoshino_river", type:"river", name:"吉野川", yomi:"よしのがわ", hint:"四国を東西に流れる川"},
-  {id:"chikugo_river", type:"river", name:"筑後川", yomi:"ちくごがわ", hint:"筑紫平野を流れる川"},
-  {id:"ouu_mountains", type:"mountain", name:"奥羽山脈", yomi:"おううさんみゃく", hint:"東北地方の中央を南北にのびる山脈"},
-  {id:"japan_alps", type:"mountain", name:"日本アルプス", yomi:"にほんアルプス", hint:"中部地方にある高い山脈の集まり"},
-  {id:"chugoku_mountains", type:"mountain", name:"中国山地", yomi:"ちゅうごくさんち", hint:"中国地方を東西にのびる山地"},
-  {id:"shikoku_mountains", type:"mountain", name:"四国山地", yomi:"しこくさんち", hint:"四国の中央部を東西にのびる山地"},
-  {id:"kyushu_mountains", type:"mountain", name:"九州山地", yomi:"きゅうしゅうさんち", hint:"九州の中央部にある山地"}
+  {id:"ishikari_plain",type:"plain",name:"石狩平野",yomi:"いしかりへいや",hint:"北海道の西側に広がる平野"},
+  {id:"tokachi_plain",type:"plain",name:"十勝平野",yomi:"とかちへいや",hint:"北海道の南東部に広がる平野"},
+  {id:"kanto_plain",type:"plain",name:"関東平野",yomi:"かんとうへいや",hint:"日本で最も広い平野"},
+  {id:"nobi_plain",type:"plain",name:"濃尾平野",yomi:"のうびへいや",hint:"木曽三川の下流に広がる平野"},
+  {id:"osaka_plain",type:"plain",name:"大阪平野",yomi:"おおさかへいや",hint:"大阪湾に面した平野"},
+  {id:"tsukushi_plain",type:"plain",name:"筑紫平野",yomi:"つくしへいや",hint:"九州北部にある平野"},
+  {id:"ishikari_river",type:"river",name:"石狩川",yomi:"いしかりがわ",hint:"北海道を流れる川"},
+  {id:"tone_river",type:"river",name:"利根川",yomi:"とねがわ",hint:"関東平野を流れる川"},
+  {id:"shinano_river",type:"river",name:"信濃川",yomi:"しなのがわ",hint:"日本で一番長い川"},
+  {id:"kiso_river",type:"river",name:"木曽川",yomi:"きそがわ",hint:"濃尾平野を流れる木曽三川の一つ"},
+  {id:"yodo_river",type:"river",name:"淀川",yomi:"よどがわ",hint:"琵琶湖から大阪湾へ流れる川"},
+  {id:"yoshino_river",type:"river",name:"吉野川",yomi:"よしのがわ",hint:"四国を東西に流れる川"},
+  {id:"chikugo_river",type:"river",name:"筑後川",yomi:"ちくごがわ",hint:"筑紫平野を流れる川"},
+  {id:"ouu_mountains",type:"mountain",name:"奥羽山脈",yomi:"おううさんみゃく",hint:"東北地方の中央を南北にのびる山脈"},
+  {id:"japan_alps",type:"mountain",name:"日本アルプス",yomi:"にほんアルプス",hint:"中部地方にある高い山脈の集まり"},
+  {id:"chugoku_mountains",type:"mountain",name:"中国山地",yomi:"ちゅうごくさんち",hint:"中国地方を東西にのびる山地"},
+  {id:"shikoku_mountains",type:"mountain",name:"四国山地",yomi:"しこくさんち",hint:"四国の中央部を東西にのびる山地"},
+  {id:"kyushu_mountains",type:"mountain",name:"九州山地",yomi:"きゅうしゅうさんち",hint:"九州の中央部にある山地"}
 ];
 
 let mode = "home";
@@ -705,7 +528,7 @@ function clearMarks(keepAnswers=false) {
     el.classList.remove("learn", "regionSelected", "regionDone");
     if (!keepAnswers) el.classList.remove("correct", "wrong");
   });
-  document.querySelectorAll(".landformFeature").forEach(el => {
+  document.querySelectorAll(".landformTarget").forEach(el => {
     el.classList.remove("learn");
     if (!keepAnswers) el.classList.remove("correct", "wrong");
   });
@@ -783,10 +606,7 @@ function pickQuestion() {
   if (quizType === "landform") {
     const pool = LANDFORMS.map(f => f.id);
     let remaining = pool.filter(id => !used.has(id));
-    if (!remaining.length) {
-      used = new Set();
-      remaining = pool;
-    }
+    if (!remaining.length) { used = new Set(); remaining = pool; }
     const id = remaining[Math.floor(Math.random() * remaining.length)];
     used.add(id);
     currentLandform = LANDFORMS.find(f => f.id === id);
@@ -839,67 +659,44 @@ function showResult(isCorrect, clickedCode, graduateMsg="") {
 }
 
 
-function updateMapVisibility() {
-  const prefMap = document.getElementById("map");
-  const landformMap = document.getElementById("landformMap");
-  if (!prefMap || !landformMap) return;
-  const showLandform = quizType === "landform";
-  prefMap.classList.toggle("hideMap", showLandform);
-  landformMap.classList.toggle("show", showLandform);
+function updateLandformVisibility() {
+  const layer = document.getElementById("landformLayer");
+  const legend = document.getElementById("landformLegend");
+  if (layer) layer.classList.toggle("show", quizType === "landform");
+  if (legend) legend.classList.toggle("show", quizType === "landform");
 }
 function setupLandformEvents() {
-  document.querySelectorAll(".landformFeature").forEach(el => {
+  document.querySelectorAll(".landformTarget").forEach(el => {
     const id = el.dataset.id;
-    el.addEventListener("click", () => answerLandform(id, el));
-    el.setAttribute("role", "button");
     const item = LANDFORMS.find(f => f.id === id);
     if (item) el.setAttribute("aria-label", item.name);
+    el.setAttribute("role", "button");
+    el.addEventListener("click", () => answerLandform(id, el));
   });
 }
 function answerLandform(id, el) {
   if (mode === "learn") {
-    resultPanel.classList.remove("show");
-    clearMarks();
+    resultPanel.classList.remove("show"); clearMarks();
     const item = LANDFORMS.find(f => f.id === id);
     el.classList.add("learn");
     question.textContent = item.name + "（" + item.yomi + "）";
-    message.textContent = item.hint;
-    message.className = "";
+    message.textContent = item.hint; message.className = "";
     return;
   }
-  if (!currentLandform) {
-    question.textContent = "先に自然地形モードを始めてね";
-    return;
-  }
-
+  if (!currentLandform) { question.textContent = "先に自然地形モードを始めてね"; return; }
   total += 1;
   const isCorrect = id === currentLandform.id;
   if (isCorrect) {
-    correct += 1;
-    streak += 1;
-    el.classList.add("correct");
-    animateEl(el, "pop");
-    beep("ok");
-    message.textContent = "○ 正解！ ここが「" + currentLandform.name + "」";
-    message.className = "okText";
+    correct += 1; streak += 1; el.classList.add("correct"); animateEl(el,"pop"); beep("ok");
+    message.textContent = "○ 正解！ ここが「" + currentLandform.name + "」"; message.className = "okText";
   } else {
-    streak = 0;
-    el.classList.add("wrong");
-    animateEl(el, "shake");
-    beep("ng");
-    const answerEl = document.querySelector('.landformFeature[data-id="' + currentLandform.id + '"]');
-    if (answerEl) {
-      answerEl.classList.add("correct");
-      animateEl(answerEl, "pop");
-    }
+    streak = 0; el.classList.add("wrong"); animateEl(el,"shake"); beep("ng");
+    const answerEl = document.querySelector('.landformTarget[data-id="' + currentLandform.id + '"]');
+    if (answerEl) { answerEl.classList.add("correct"); animateEl(answerEl,"pop"); }
     const clicked = LANDFORMS.find(f => f.id === id);
-    message.textContent = "× ここは「" + clicked.name + "」。正解は「" + currentLandform.name + "」";
-    message.className = "ngText";
+    message.textContent = "× ここは「" + clicked.name + "」。正解は「" + currentLandform.name + "」"; message.className = "ngText";
   }
-
-  save();
-  updateStats();
-  showLandformResult(isCorrect, id);
+  save(); updateStats(); showLandformResult(isCorrect,id);
 }
 function showLandformResult(isCorrect, clickedId) {
   const clicked = LANDFORMS.find(f => f.id === clickedId);
@@ -976,9 +773,7 @@ function showRegionResult() {
 }
 
 function answer(code, el) {
-  if (quizType === "landform") {
-    return;
-  }
+  if (quizType === "landform") { return; }
   if (quizType === "region" && mode !== "learn") {
     answerRegion(code, el);
     return;
@@ -1193,7 +988,7 @@ function setQuizType(type) {
     btn.classList.toggle("primary", type === val);
     btn.classList.toggle("soft", type !== val);
   });
-  updateMapVisibility();
+  updateLandformVisibility();
   renderList();
   const box = document.getElementById("answerListBox");
   const btn = document.getElementById("toggleListBtn");
