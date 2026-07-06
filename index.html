@@ -3,183 +3,301 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>都道府県マスター</title>
+<title>都道府県マスター Ver.3</title>
 <style>
+:root {
+  --main:#08a6a0;
+  --main2:#6ed2cf;
+  --bg:#eefafa;
+  --card:#ffffff;
+  --text:#183236;
+  --muted:#5f7479;
+  --ok:#16a34a;
+  --ng:#ef4444;
+  --warn:#f59e0b;
+}
+* { box-sizing:border-box; }
 body {
   margin:0;
-  background:#f4fbfb;
-  color:#20373a;
+  background:linear-gradient(180deg,#eefafa,#f8ffff);
+  color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
 }
 header {
-  background:linear-gradient(135deg,#20a7a2,#6bc8c4);
-  color:white;
-  padding:14px 16px;
   position:sticky;
   top:0;
-  z-index:10;
+  z-index:20;
+  background:linear-gradient(135deg,var(--main),var(--main2));
+  color:white;
+  padding:14px 18px;
+  box-shadow:0 2px 14px rgba(0,0,0,.14);
 }
-h1 { margin:0; font-size:22px; }
-main { max-width:1120px; margin:auto; padding:10px; }
+h1 { margin:0; font-size:24px; }
+main { max-width:1180px; margin:auto; padding:14px; }
 .card {
-  background:white;
-  border-radius:18px;
-  padding:14px;
-  margin-bottom:12px;
-  box-shadow:0 4px 18px rgba(20,80,80,.10);
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:20px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 5px 22px rgba(0,80,80,.10);
 }
-.buttons { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.topGrid {
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:14px;
+}
+.controls {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
 button, select {
-  font-size:16px;
+  appearance:none;
   border:0;
   border-radius:14px;
-  padding:12px;
-  background:#eaf8f7;
-  color:#20373a;
-  font-weight:700;
   min-height:46px;
+  padding:10px 14px;
+  font-size:16px;
+  font-weight:800;
+  background:#e8f8f7;
+  color:var(--text);
 }
-button.primary { background:#20a7a2; color:white; }
-button.danger { background:#ffecec; color:#a62121; }
-.row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-select { background:white; border:1px solid #cfe1e1; }
-#question { font-size:25px; font-weight:900; margin:10px 0 4px; line-height:1.35; }
-#message { min-height:30px; font-size:18px; font-weight:900; }
-.ok { color:#21a65b; }
-.ng { color:#e34c4c; }
-.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:8px; }
-.stat { background:#f5fbfb; border-radius:14px; text-align:center; padding:9px; }
-.stat b { display:block; font-size:20px; }
-.stat span { font-size:12px; color:#667; }
-.mapShell {
-  overflow:auto;
+button.primary { background:var(--main); color:white; }
+button.danger { background:#ffecec; color:#b91c1c; }
+button.soft { background:#f0fbfb; }
+button:active { transform:scale(.98); }
+select {
   background:white;
+  border:1px solid #d0e4e5;
+  min-width:160px;
+}
+#question {
+  margin:14px 0 4px;
+  font-size:30px;
+  line-height:1.3;
+  font-weight:900;
+}
+#message {
+  min-height:32px;
+  font-size:18px;
+  font-weight:900;
+}
+.okText { color:var(--ok); }
+.ngText { color:var(--ng); }
+.stats {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:8px;
+}
+.stat {
+  background:#f5fbfb;
+  border:1px solid #d9eeee;
+  border-radius:16px;
+  padding:10px;
+  text-align:center;
+}
+.stat b { display:block; font-size:24px; }
+.stat span { font-size:12px; color:var(--muted); }
+.mapCard {
+  position:relative;
+  overflow:hidden;
+}
+#map {
+  width:100%;
+  min-height:560px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#f8ffff,#effafa);
   border-radius:18px;
-  border:1px solid #d7e6e6;
-  box-shadow:0 4px 18px rgba(20,80,80,.10);
-  margin-bottom:12px;
+  border:1px solid #d9eeee;
+  overflow:auto;
+  padding:12px;
 }
-.map { position:relative; min-width:760px; }
-.map img { width:100%; display:block; user-select:none; -webkit-user-drag:none; }
-.pin {
-  position:absolute;
-  transform:translate(-50%,-50%);
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  padding:0;
-  z-index:5;
-  background:rgba(32,167,162,.55);
-  border:2px solid rgba(0,0,0,.45);
-  box-shadow:0 1px 4px rgba(0,0,0,.25);
+#map svg {
+  width:min(100%, 880px);
+  height:auto;
+  max-height:82vh;
 }
-.pin::after {
-  content:"";
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width:34px;
-  height:34px;
-  border-radius:50%;
+.geolonia-svg-map .prefecture {
+  fill:#ffffff;
+  stroke:#53676b;
+  stroke-width:.8;
+  cursor:pointer;
+  transition:fill .15s ease, filter .15s ease, transform .15s ease;
 }
-.pin.hit { background:rgba(33,166,91,.95); border-color:#127a3d; }
-.pin.miss { background:rgba(227,76,76,.95); border-color:#a62020; }
-.pin.learn { background:rgba(244,180,0,.95); border-color:#9a7200; }
-.label {
-  display:none;
+.geolonia-svg-map .prefecture:hover {
+  fill:#bff1ee;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.25));
+}
+.geolonia-svg-map .prefecture.correct {
+  fill:#86efac !important;
+}
+.geolonia-svg-map .prefecture.wrong {
+  fill:#fca5a5 !important;
+}
+.geolonia-svg-map .prefecture.current {
+  fill:#fef3c7 !important;
+}
+.geolonia-svg-map .boundary-line {
+  stroke:#8ca2a6;
+}
+.resultPanel {
   position:absolute;
-  left:14px;
-  top:-13px;
-  white-space:nowrap;
+  right:26px;
+  bottom:28px;
+  width:min(320px, calc(100% - 52px));
   background:white;
-  border:1px solid #9eb0b2;
-  border-radius:8px;
-  padding:2px 6px;
-  font-size:13px;
-  box-shadow:0 1px 5px rgba(0,0,0,.18);
+  border-radius:22px;
+  box-shadow:0 8px 28px rgba(0,0,0,.18);
+  border:1px solid #d9eeee;
+  padding:18px;
+  text-align:center;
+  display:none;
 }
-.showLabels .label { display:block; }
-.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; }
-.chip { background:#f5fbfb; padding:8px 10px; border-radius:12px; font-size:14px; }
-.small { color:#667; font-size:13px; line-height:1.6; }
-@media(max-width:760px) {
-  .buttons { grid-template-columns:repeat(2,1fr); }
+.resultPanel.show { display:block; }
+.resultPanel h2 {
+  margin:0 0 8px;
+  font-size:26px;
+}
+.resultPanel .big {
+  font-size:34px;
+  font-weight:900;
+  margin:8px 0;
+}
+.legend {
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  font-size:14px;
+  color:var(--muted);
+}
+.dot {
+  display:inline-block;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  vertical-align:-2px;
+  margin-right:4px;
+}
+.dot.ok { background:#86efac; }
+.dot.ng { background:#fca5a5; }
+.dot.now { background:#fef3c7; border:1px solid #d6a900; }
+.list {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(135px,1fr));
+  gap:8px;
+}
+.chip {
+  padding:9px 10px;
+  background:#f5fbfb;
+  border:1px solid #e0eeee;
+  border-radius:13px;
+  font-size:14px;
+}
+.small {
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+}
+.loading {
+  font-weight:900;
+  color:var(--muted);
+  padding:20px;
+}
+@media(max-width:850px) {
+  main { padding:10px; }
+  .topGrid { grid-template-columns:1fr; }
   .stats { grid-template-columns:repeat(2,1fr); }
-  #question { font-size:22px; }
-  .map { min-width:760px; }
-  .pin { width:20px; height:20px; }
-  .pin::after { width:40px; height:40px; }
+  #question { font-size:25px; }
+  #map { min-height:460px; justify-content:flex-start; }
+  #map svg { min-width:620px; }
+  .resultPanel { position:static; width:100%; margin-top:12px; }
 }
 </style>
 </head>
 <body>
-<header><h1>🏯 都道府県マスター</h1></header>
+<header><h1>👑 都道府県マスター Ver.3</h1></header>
+
 <main>
-<section class="card">
-  <div class="buttons">
-    <button class="primary" id="startBtn">🎮 クイズ</button>
-    <button id="learnBtn">📍 学習</button>
-    <button id="weakBtn">🧠 苦手</button>
-    <button id="labelsBtn">👀 答え</button>
-  </div>
-</section>
+  <section class="card topGrid">
+    <div>
+      <div class="controls">
+        <select id="region">
+          <option>全国</option>
+          <option>北海道</option>
+          <option>東北</option>
+          <option>関東</option>
+          <option>中部</option>
+          <option>近畿</option>
+          <option>中国</option>
+          <option>四国</option>
+          <option>九州・沖縄</option>
+        </select>
+        <button class="primary" id="startBtn">🎮 クイズ</button>
+        <button class="soft" id="learnBtn">📍 学習</button>
+        <button class="soft" id="weakBtn">🧠 苦手</button>
+        <button class="danger" id="resetBtn">記録リセット</button>
+      </div>
+      <div id="question">「クイズ」を押してね</div>
+      <div id="message">県の形そのものをクリックできます。</div>
+    </div>
+    <div>
+      <div class="stats">
+        <div class="stat"><b id="correct">0</b><span>正解</span></div>
+        <div class="stat"><b id="total">0</b><span>問題</span></div>
+        <div class="stat"><b id="rate">0%</b><span>正答率</span></div>
+        <div class="stat"><b id="weakCount">0</b><span>苦手県</span></div>
+      </div>
+      <p class="small">学習モードではクリックした県名を表示します。クイズでは正解が緑、不正解が赤になります。</p>
+    </div>
+  </section>
 
-<section class="card">
-  <div class="row">
-    <select id="region">
-      <option>全国</option>
-      <option>北海道</option>
-      <option>東北</option>
-      <option>関東</option>
-      <option>中部</option>
-      <option>近畿</option>
-      <option>中国</option>
-      <option>四国</option>
-      <option>九州・沖縄</option>
-    </select>
-    <button id="nextBtn">次の問題</button>
-    <button class="danger" id="resetBtn">記録リセット</button>
-  </div>
-  <div id="question">「クイズ」を押してね</div>
-  <div id="message"></div>
-  <div class="stats">
-    <div class="stat"><b id="correct">0</b><span>正解</span></div>
-    <div class="stat"><b id="total">0</b><span>問題</span></div>
-    <div class="stat"><b id="rate">0%</b><span>正答率</span></div>
-    <div class="stat"><b id="weakCount">0</b><span>苦手県</span></div>
-  </div>
-</section>
+  <section class="card mapCard">
+    <div class="legend">
+      <span><i class="dot ok"></i>正解</span>
+      <span><i class="dot ng"></i>不正解</span>
+      <span><i class="dot now"></i>出題中</span>
+    </div>
+    <div id="map"><div class="loading">地図を読み込み中...</div></div>
+    <div class="resultPanel" id="resultPanel">
+      <h2 id="resultTitle">正解！</h2>
+      <div id="resultSub">ここは</div>
+      <div class="big" id="resultName">愛媛県</div>
+      <div id="resultInfo">四国／県庁所在地：松山市</div>
+      <button class="primary" id="nextBtn" style="margin-top:14px;">次の問題へ</button>
+    </div>
+  </section>
 
-<section class="mapShell">
-  <div class="map" id="map">
-    <img src="map.jpeg" alt="日本の白地図">
-  </div>
-</section>
-
-<section class="card">
-  <p class="small">丸は小さくしましたが、タップ判定は少し広めにしています。答えボタンで県名を表示できます。</p>
-  <div class="grid" id="prefList"></div>
-</section>
+  <section class="card">
+    <p class="small">使用地図：Geolonia Japanese Prefectures SVG。都道府県ごとのSVG要素をクリック判定に使っています。</p>
+    <div class="list" id="prefList"></div>
+  </section>
 </main>
 
 <script>
-const prefs = [["北海道", "北海道", "札幌市", 73.5, 13.7], ["青森県", "東北", "青森市", 64.9, 30.3], ["岩手県", "東北", "盛岡市", 69.5, 36.6], ["宮城県", "東北", "仙台市", 68.7, 45.0], ["秋田県", "東北", "秋田市", 63.7, 37.5], ["山形県", "東北", "山形市", 64.7, 45.0], ["福島県", "東北", "福島市", 65.7, 52.2], ["茨城県", "関東", "水戸市", 66.4, 61.4], ["栃木県", "関東", "宇都宮市", 62.8, 58.5], ["群馬県", "関東", "前橋市", 59.5, 58.8], ["埼玉県", "関東", "さいたま市", 61.8, 62.7], ["千葉県", "関東", "千葉市", 66.8, 66.8], ["東京都", "関東", "新宿区", 62.6, 66.0], ["神奈川県", "関東", "横浜市", 61.2, 68.7], ["新潟県", "中部", "新潟市", 56.8, 49.8], ["富山県", "中部", "富山市", 49.8, 55.8], ["石川県", "中部", "金沢市", 45.7, 58.3], ["福井県", "中部", "福井市", 43.6, 62.0], ["山梨県", "中部", "甲府市", 57.9, 65.6], ["長野県", "中部", "長野市", 54.2, 61.0], ["岐阜県", "中部", "岐阜市", 48.8, 65.4], ["静岡県", "中部", "静岡市", 56.6, 70.0], ["愛知県", "中部", "名古屋市", 50.5, 70.2], ["三重県", "近畿", "津市", 46.9, 72.8], ["滋賀県", "近畿", "大津市", 45.5, 66.6], ["京都府", "近畿", "京都市", 42.1, 66.0], ["大阪府", "近畿", "大阪市", 40.2, 70.5], ["兵庫県", "近畿", "神戸市", 36.5, 67.4], ["奈良県", "近畿", "奈良市", 43.2, 71.7], ["和歌山県", "近畿", "和歌山市", 40.5, 76.6], ["鳥取県", "中国", "鳥取市", 31.0, 63.5], ["島根県", "中国", "松江市", 26.2, 63.7], ["岡山県", "中国", "岡山市", 31.1, 69.2], ["広島県", "中国", "広島市", 26.5, 70.2], ["山口県", "中国", "山口市", 19.2, 72.4], ["徳島県", "四国", "徳島市", 35.7, 77.0], ["香川県", "四国", "高松市", 32.0, 74.2], ["愛媛県", "四国", "松山市", 26.5, 77.8], ["高知県", "四国", "高知市", 30.6, 82.0], ["福岡県", "九州・沖縄", "福岡市", 13.8, 76.3], ["佐賀県", "九州・沖縄", "佐賀市", 10.8, 78.9], ["長崎県", "九州・沖縄", "長崎市", 8.7, 81.3], ["熊本県", "九州・沖縄", "熊本市", 11.6, 84.4], ["大分県", "九州・沖縄", "大分市", 16.2, 81.5], ["宮崎県", "九州・沖縄", "宮崎市", 15.1, 89.0], ["鹿児島県", "九州・沖縄", "鹿児島市", 10.9, 91.4], ["沖縄県", "九州・沖縄", "那覇市", 79.5, 74.8]];
-let mode = "home";
-let current = null;
-let used = new Set();
-let correct = Number(localStorage.getItem("tdfk_correct") || 0);
-let total = Number(localStorage.getItem("tdfk_total") || 0);
-let weak = new Set(JSON.parse(localStorage.getItem("tdfk_weak") || "[]"));
+const PREFS = {"1": ["北海道", "北海道", "札幌市", "ほっかいどう"], "2": ["青森県", "東北", "青森市", "あおもりけん"], "3": ["岩手県", "東北", "盛岡市", "いわてけん"], "4": ["宮城県", "東北", "仙台市", "みやぎけん"], "5": ["秋田県", "東北", "秋田市", "あきたけん"], "6": ["山形県", "東北", "山形市", "やまがたけん"], "7": ["福島県", "東北", "福島市", "ふくしまけん"], "8": ["茨城県", "関東", "水戸市", "いばらきけん"], "9": ["栃木県", "関東", "宇都宮市", "とちぎけん"], "10": ["群馬県", "関東", "前橋市", "ぐんまけん"], "11": ["埼玉県", "関東", "さいたま市", "さいたまけん"], "12": ["千葉県", "関東", "千葉市", "ちばけん"], "13": ["東京都", "関東", "新宿区", "とうきょうと"], "14": ["神奈川県", "関東", "横浜市", "かながわけん"], "15": ["新潟県", "中部", "新潟市", "にいがたけん"], "16": ["富山県", "中部", "富山市", "とやまけん"], "17": ["石川県", "中部", "金沢市", "いしかわけん"], "18": ["福井県", "中部", "福井市", "ふくいけん"], "19": ["山梨県", "中部", "甲府市", "やまなしけん"], "20": ["長野県", "中部", "長野市", "ながのけん"], "21": ["岐阜県", "中部", "岐阜市", "ぎふけん"], "22": ["静岡県", "中部", "静岡市", "しずおかけん"], "23": ["愛知県", "中部", "名古屋市", "あいちけん"], "24": ["三重県", "近畿", "津市", "みえけん"], "25": ["滋賀県", "近畿", "大津市", "しがけん"], "26": ["京都府", "近畿", "京都市", "きょうとふ"], "27": ["大阪府", "近畿", "大阪市", "おおさかふ"], "28": ["兵庫県", "近畿", "神戸市", "ひょうごけん"], "29": ["奈良県", "近畿", "奈良市", "ならけん"], "30": ["和歌山県", "近畿", "和歌山市", "わかやまけん"], "31": ["鳥取県", "中国", "鳥取市", "とっとりけん"], "32": ["島根県", "中国", "松江市", "しまねけん"], "33": ["岡山県", "中国", "岡山市", "おかやまけん"], "34": ["広島県", "中国", "広島市", "ひろしまけん"], "35": ["山口県", "中国", "山口市", "やまぐちけん"], "36": ["徳島県", "四国", "徳島市", "とくしまけん"], "37": ["香川県", "四国", "高松市", "かがわけん"], "38": ["愛媛県", "四国", "松山市", "えひめけん"], "39": ["高知県", "四国", "高知市", "こうちけん"], "40": ["福岡県", "九州・沖縄", "福岡市", "ふくおかけん"], "41": ["佐賀県", "九州・沖縄", "佐賀市", "さがけん"], "42": ["長崎県", "九州・沖縄", "長崎市", "ながさきけん"], "43": ["熊本県", "九州・沖縄", "熊本市", "くまもとけん"], "44": ["大分県", "九州・沖縄", "大分市", "おおいたけん"], "45": ["宮崎県", "九州・沖縄", "宮崎市", "みやざきけん"], "46": ["鹿児島県", "九州・沖縄", "鹿児島市", "かごしまけん"], "47": ["沖縄県", "九州・沖縄", "那覇市", "おきなわけん"]};
+const MAP_URL = "https://cdn.jsdelivr.net/gh/geolonia/japanese-prefectures@master/map-full.svg";
 
-const map = document.getElementById("map");
+let mode = "home";
+let currentCode = null;
+let used = new Set();
+let correct = Number(localStorage.getItem("tdfk3_correct") || 0);
+let total = Number(localStorage.getItem("tdfk3_total") || 0);
+let weak = new Set(JSON.parse(localStorage.getItem("tdfk3_weak") || "[]"));
+let mapReady = false;
+
 const question = document.getElementById("question");
 const message = document.getElementById("message");
+const resultPanel = document.getElementById("resultPanel");
 
 function save() {
-  localStorage.setItem("tdfk_correct", String(correct));
-  localStorage.setItem("tdfk_total", String(total));
-  localStorage.setItem("tdfk_weak", JSON.stringify(Array.from(weak)));
+  localStorage.setItem("tdfk3_correct", String(correct));
+  localStorage.setItem("tdfk3_total", String(total));
+  localStorage.setItem("tdfk3_weak", JSON.stringify(Array.from(weak)));
 }
 
 function updateStats() {
@@ -189,145 +307,186 @@ function updateStats() {
   document.getElementById("weakCount").textContent = weak.size;
 }
 
-function clearMarks() {
-  document.querySelectorAll(".pin").forEach(function(pin) {
-    pin.classList.remove("hit", "miss", "learn");
+function codeOf(el) {
+  return String(Number(el.dataset.code || el.getAttribute("data-code")));
+}
+
+function allPrefEls() {
+  return Array.from(document.querySelectorAll(".geolonia-svg-map .prefecture"));
+}
+
+function clearMarks(keepAnswers=false) {
+  allPrefEls().forEach(el => {
+    el.classList.remove("current");
+    if (!keepAnswers) {
+      el.classList.remove("correct", "wrong");
+    }
   });
 }
 
 function getPool() {
-  let arr = prefs;
-  const selectedRegion = document.getElementById("region").value;
+  let entries = Object.entries(PREFS);
+  const selected = document.getElementById("region").value;
   if (mode === "weak") {
-    arr = prefs.filter(function(p) { return weak.has(p[0]); });
-  } else if (selectedRegion !== "全国") {
-    arr = prefs.filter(function(p) { return p[1] === selectedRegion; });
+    entries = entries.filter(([code]) => weak.has(code));
+  } else if (selected !== "全国") {
+    entries = entries.filter(([code, data]) => data[1] === selected);
   }
-  return arr;
+  return entries.map(([code]) => code);
 }
 
-function nextQuestion() {
-  clearMarks();
-  const arr = getPool();
-  if (arr.length === 0) {
-    current = null;
+function pickQuestion() {
+  if (!mapReady) {
+    message.textContent = "地図を読み込み中です。少し待ってください。";
+    return;
+  }
+  resultPanel.classList.remove("show");
+  clearMarks(true);
+  const pool = getPool();
+  if (!pool.length) {
+    currentCode = null;
     question.textContent = mode === "weak" ? "苦手県はまだありません" : "問題がありません";
     message.textContent = mode === "weak" ? "間違えた県がここにたまります。" : "";
-    message.className = "";
     return;
   }
-
-  let remaining = arr.filter(function(p) { return !used.has(p[0]); });
-  if (remaining.length === 0) {
+  let remaining = pool.filter(code => !used.has(code));
+  if (!remaining.length) {
     used = new Set();
-    remaining = arr;
+    remaining = pool;
   }
+  currentCode = remaining[Math.floor(Math.random() * remaining.length)];
+  used.add(currentCode);
+  const data = PREFS[currentCode];
 
-  current = remaining[Math.floor(Math.random() * remaining.length)];
-  used.add(current[0]);
-  question.textContent = "「" + current[0] + "」はどこ？";
-  message.textContent = "県庁所在地：" + current[2];
-  message.className = "";
+  question.textContent = "「" + data[0] + "」はどこ？";
+  message.textContent = "ヒント：地方は「" + data[1] + "」／県庁所在地：" + data[2];
+
+  const target = document.querySelector('.geolonia-svg-map .prefecture[data-code="' + Number(currentCode) + '"]');
+  if (target) target.classList.add("current");
 }
 
-function answer(pref, button) {
+function showResult(isCorrect, clickedCode) {
+  const clicked = PREFS[clickedCode];
+  const answer = PREFS[currentCode];
+  document.getElementById("resultTitle").textContent = isCorrect ? "✨ 正解！" : "❌ まちがい";
+  document.getElementById("resultTitle").className = isCorrect ? "okText" : "ngText";
+  document.getElementById("resultSub").textContent = isCorrect ? "ここは" : "ここは「" + clicked[0] + "」。正解は";
+  document.getElementById("resultName").textContent = answer[0] + "（" + answer[3] + "）";
+  document.getElementById("resultInfo").textContent = answer[1] + "／県庁所在地：" + answer[2];
+  resultPanel.classList.add("show");
+}
+
+function answer(code, el) {
   if (mode === "learn") {
+    resultPanel.classList.remove("show");
     clearMarks();
-    button.classList.add("learn");
-    question.textContent = pref[0];
-    message.textContent = pref[1] + "／県庁所在地：" + pref[2];
+    el.classList.add("current");
+    const data = PREFS[code];
+    question.textContent = data[0] + "（" + data[3] + "）";
+    message.textContent = data[1] + "／県庁所在地：" + data[2];
     message.className = "";
     return;
   }
 
-  if (!current) {
+  if (!currentCode) {
     question.textContent = "先にクイズを始めてね";
     return;
   }
 
   total += 1;
-  if (pref[0] === current[0]) {
+  const isCorrect = code === currentCode;
+  if (isCorrect) {
     correct += 1;
-    weak.delete(pref[0]);
-    button.classList.add("hit");
+    weak.delete(code);
+    el.classList.add("correct");
     message.textContent = "○ 正解！";
-    message.className = "ok";
-    save();
-    updateStats();
-    setTimeout(nextQuestion, 650);
+    message.className = "okText";
   } else {
-    weak.add(current[0]);
-    button.classList.add("miss");
-    message.textContent = "× ここは「" + pref[0] + "」。正解は「" + current[0] + "」";
-    message.className = "ng";
-    save();
-    updateStats();
+    weak.add(currentCode);
+    el.classList.add("wrong");
+    const answerEl = document.querySelector('.geolonia-svg-map .prefecture[data-code="' + Number(currentCode) + '"]');
+    if (answerEl) answerEl.classList.add("correct");
+    message.textContent = "× ここは「" + PREFS[code][0] + "」。正解は「" + PREFS[currentCode][0] + "」";
+    message.className = "ngText";
+  }
+
+  save();
+  updateStats();
+  showResult(isCorrect, code);
+}
+
+async function loadMap() {
+  try {
+    const res = await fetch(MAP_URL);
+    if (!res.ok) throw new Error("map fetch failed");
+    const svg = await res.text();
+    document.getElementById("map").innerHTML = svg;
+
+    allPrefEls().forEach(el => {
+      const code = codeOf(el);
+      if (!PREFS[code]) return;
+      el.setAttribute("tabindex", "0");
+      el.setAttribute("role", "button");
+      el.setAttribute("aria-label", PREFS[code][0]);
+      el.addEventListener("click", () => answer(code, el));
+      el.addEventListener("keydown", ev => {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          answer(code, el);
+        }
+      });
+    });
+
+    mapReady = true;
+    message.textContent = "準備できました。県の形をクリックできます。";
+  } catch (e) {
+    document.getElementById("map").innerHTML = '<div class="loading">地図の読み込みに失敗しました。ネット接続を確認して、再読み込みしてください。</div>';
   }
 }
 
-prefs.forEach(function(pref) {
-  const btn = document.createElement("button");
-  btn.className = "pin";
-  btn.style.left = pref[3] + "%";
-  btn.style.top = pref[4] + "%";
-  btn.setAttribute("aria-label", pref[0]);
-
-  const label = document.createElement("span");
-  label.className = "label";
-  label.textContent = pref[0];
-  btn.appendChild(label);
-
-  btn.addEventListener("click", function() {
-    answer(pref, btn);
-  });
-
-  map.appendChild(btn);
-
+Object.entries(PREFS).forEach(([code, data]) => {
   const chip = document.createElement("div");
   chip.className = "chip";
-  chip.textContent = pref[0] + "｜" + pref[2];
+  chip.textContent = data[0] + "｜" + data[2];
   document.getElementById("prefList").appendChild(chip);
 });
 
-document.getElementById("startBtn").addEventListener("click", function() {
+document.getElementById("startBtn").addEventListener("click", () => {
   mode = "quiz";
   used = new Set();
-  nextQuestion();
+  message.className = "";
+  pickQuestion();
 });
 
-document.getElementById("learnBtn").addEventListener("click", function() {
+document.getElementById("learnBtn").addEventListener("click", () => {
   mode = "learn";
-  current = null;
+  currentCode = null;
+  resultPanel.classList.remove("show");
   clearMarks();
-  question.textContent = "地図をタップして県名を確認";
-  message.textContent = "学習モード";
+  question.textContent = "地図の県をクリックして確認";
+  message.textContent = "学習モードです。県そのものをクリックしてね。";
   message.className = "";
 });
 
-document.getElementById("weakBtn").addEventListener("click", function() {
+document.getElementById("weakBtn").addEventListener("click", () => {
   mode = "weak";
   used = new Set();
-  nextQuestion();
+  message.className = "";
+  pickQuestion();
 });
 
-document.getElementById("labelsBtn").addEventListener("click", function() {
-  map.classList.toggle("showLabels");
-});
+document.getElementById("nextBtn").addEventListener("click", pickQuestion);
 
-document.getElementById("nextBtn").addEventListener("click", function() {
-  if (mode === "home") mode = "quiz";
-  nextQuestion();
-});
-
-document.getElementById("region").addEventListener("change", function() {
+document.getElementById("region").addEventListener("change", () => {
   if (mode !== "learn") {
     mode = "quiz";
     used = new Set();
-    nextQuestion();
+    message.className = "";
+    pickQuestion();
   }
 });
 
-document.getElementById("resetBtn").addEventListener("click", function() {
+document.getElementById("resetBtn").addEventListener("click", () => {
   if (confirm("記録を消しますか？")) {
     correct = 0;
     total = 0;
@@ -336,12 +495,15 @@ document.getElementById("resetBtn").addEventListener("click", function() {
     save();
     updateStats();
     clearMarks();
+    resultPanel.classList.remove("show");
     question.textContent = "記録をリセットしました";
     message.textContent = "";
+    message.className = "";
   }
 });
 
 updateStats();
+loadMap();
 </script>
 </body>
 </html>
