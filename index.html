@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>日本地理マスター Ver.7</title>
+<title>日本地理マスター Ver.7.1</title>
 <style>
 :root {
   --main:#08a6a0; --main2:#6ed2cf; --bg:#eefafa; --card:#ffffff;
@@ -150,15 +150,13 @@ button.pulse {
 </style>
 </head>
 <body>
-<header><h1>👑 日本地理マスター Ver.7.1</h1></header>
+<header><h1>👑 日本地理マスター Ver.7.1.1</h1></header>
 <main>
   <section class="card topGrid">
     <div>
       <div class="controls">
-        <select id="quizType">
-          <option value="prefecture">都道府県の位置</option>
-          <option value="capital">県庁所在地</option>
-        </select>
+        <button class="primary" id="prefModeBtn">🗾 都道府県</button>
+        <button class="soft" id="capitalModeBtn">🏙 県庁所在地</button>
         <select id="region">
           <option>全国</option><option>北海道</option><option>東北</option><option>関東</option>
           <option>中部</option><option>近畿</option><option>中国</option><option>四国</option><option>九州・沖縄</option>
@@ -173,7 +171,7 @@ button.pulse {
         <button class="soft" id="soundBtn">🔊 音ON</button>
       </div>
       <div id="question">「クイズ」を押してね</div>
-      <div id="message">Ver.7：県庁所在地モードを追加。</div>
+      <div id="message">Ver.7.1：県庁所在地モードを追加。</div>
       <div class="progressWrap">
         <div class="progressText" id="progressText">進み具合：未開始</div>
         <div class="progressBar"><div id="progressFill"></div></div>
@@ -236,6 +234,7 @@ const PREFS = {"1": ["北海道", "北海道", "札幌市", "ほっかいどう"
 const MAP_URL = "https://cdn.jsdelivr.net/gh/geolonia/japanese-prefectures@master/map-full.svg";
 
 let mode = "home";
+let quizType = "prefecture";
 let currentCode = null;
 let used = new Set();
 let correct = Number(localStorage.getItem("tdfk5_correct") || 0);
@@ -491,8 +490,7 @@ function pickQuestion() {
   currentCode = pool[Math.floor(Math.random() * pool.length)];
   used.add(currentCode);
   const data = PREFS[currentCode];
-  const type = document.getElementById("quizType").value;
-  if (type === "capital") {
+  if (quizType === "capital") {
     question.textContent = "「" + data[2] + "」が県庁所在地なのはどこ？";
     message.textContent = "ヒント：地方は「" + data[1] + "」";
   } else {
@@ -508,8 +506,7 @@ function showResult(isCorrect, clickedCode, graduateMsg="") {
   document.getElementById("resultTitle").textContent = isCorrect ? "✨ 正解！" : "❌ まちがい";
   document.getElementById("resultTitle").className = isCorrect ? "okText" : "ngText";
   document.getElementById("resultSub").textContent = isCorrect ? "ここは" : "ここは「" + clicked[0] + "」。正解は";
-  const type = document.getElementById("quizType").value;
-  if (type === "capital") {
+  if (quizType === "capital") {
     document.getElementById("resultName").textContent = answer[0];
     document.getElementById("resultInfo").textContent = "県庁所在地：" + answer[2] + "（" + answer[3] + "）／" + answer[1];
   } else {
@@ -683,6 +680,28 @@ function renderList() {
     list.appendChild(chip);
   });
 }
+
+function setQuizType(type) {
+  quizType = type;
+  document.getElementById("prefModeBtn").classList.toggle("modeOn", type === "prefecture");
+  document.getElementById("capitalModeBtn").classList.toggle("modeOn", type === "capital");
+  document.getElementById("prefModeBtn").classList.toggle("primary", type === "prefecture");
+  document.getElementById("prefModeBtn").classList.toggle("soft", type !== "prefecture");
+  document.getElementById("capitalModeBtn").classList.toggle("primary", type === "capital");
+  document.getElementById("capitalModeBtn").classList.toggle("soft", type !== "capital");
+  if (mode !== "learn") {
+    mode = "quiz";
+    used = new Set();
+    message.className = "";
+    clearMarks();
+    pickQuestion();
+  } else {
+    question.textContent = type === "capital" ? "県をクリックして県庁所在地を確認" : "地図の県をクリックして確認";
+  }
+}
+document.getElementById("prefModeBtn").addEventListener("click", () => setQuizType("prefecture"));
+document.getElementById("capitalModeBtn").addEventListener("click", () => setQuizType("capital"));
+
 document.getElementById("startBtn").addEventListener("click", () => {
   mode = "quiz"; challengeActive = false; timeAttack = false; used = new Set(); stopTimer(); document.getElementById("timerText").textContent="";
   message.className = ""; clearMarks(); updateProgress(); pickQuestion();
@@ -702,10 +721,6 @@ document.getElementById("weakBtn").addEventListener("click", () => {
   message.className = ""; clearMarks(); updateProgress(); pickQuestion();
 });
 document.getElementById("nextBtn").addEventListener("click", pickQuestion);
-document.getElementById("quizType").addEventListener("change", () => {
-  if (mode !== "learn") { mode = "quiz"; used = new Set(); message.className = ""; clearMarks(); pickQuestion(); }
-});
-
 document.getElementById("region").addEventListener("change", () => {
   if (mode !== "learn") { mode = "quiz"; challengeActive = false; timeAttack = false; used = new Set(); stopTimer(); document.getElementById("timerText").textContent="";
   message.className = ""; clearMarks(); updateProgress(); pickQuestion(); }
@@ -736,6 +751,7 @@ updateStats();
 updateProgress();
 renderList();
 setSoundButton();
+setQuizType("prefecture");
 loadMap();
 </script>
 </body>
