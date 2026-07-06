@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>都道府県マスター Ver.5</title>
+<title>都道府県マスター Ver.6</title>
 <style>
 :root {
   --main:#08a6a0; --main2:#6ed2cf; --bg:#eefafa; --card:#ffffff;
@@ -102,6 +102,46 @@ select { background:white; border:1px solid #d0e4e5; min-width:150px; }
 }
 @keyframes fall { to { transform:translateY(110vh) rotate(720deg); opacity:.9; } }
 .timerBig { font-size:20px; font-weight:900; color:#0f766e; }
+
+.geolonia-svg-map .prefecture.pop {
+  animation: popAnswer .38s ease;
+}
+.geolonia-svg-map .prefecture.shake {
+  animation: shakeAnswer .34s ease;
+}
+.resultPanel.show {
+  animation: panelPop .28s ease;
+}
+button.pulse {
+  animation: buttonPulse .35s ease;
+}
+@keyframes popAnswer {
+  0% { filter:brightness(1); }
+  45% { filter:brightness(1.25) drop-shadow(0 0 8px rgba(22,163,74,.7)); }
+  100% { filter:brightness(1); }
+}
+@keyframes shakeAnswer {
+  0%,100% { transform:translateX(0); }
+  20% { transform:translateX(-3px); }
+  40% { transform:translateX(3px); }
+  60% { transform:translateX(-2px); }
+  80% { transform:translateX(2px); }
+}
+@keyframes panelPop {
+  0% { transform:scale(.94); opacity:.25; }
+  100% { transform:scale(1); opacity:1; }
+}
+@keyframes buttonPulse {
+  0% { transform:scale(1); }
+  50% { transform:scale(1.08); }
+  100% { transform:scale(1); }
+}
+.soundNote {
+  font-size:12px;
+  color:var(--muted);
+  margin-top:6px;
+}
+
 @media(max-width:850px) {
   main { padding:10px; } .topGrid { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,1fr); }
   #question { font-size:25px; } #map { min-height:460px; justify-content:flex-start; }
@@ -110,7 +150,7 @@ select { background:white; border:1px solid #d0e4e5; min-width:150px; }
 </style>
 </head>
 <body>
-<header><h1>👑 都道府県マスター Ver.5</h1></header>
+<header><h1>👑 都道府県マスター Ver.6</h1></header>
 <main>
   <section class="card topGrid">
     <div>
@@ -126,9 +166,10 @@ select { background:white; border:1px solid #d0e4e5; min-width:150px; }
         <button class="soft" id="learnBtn">📍 学習</button>
         <button class="soft" id="weakBtn">🧠 苦手</button>
         <button class="danger" id="resetBtn">記録リセット</button>
+        <button class="soft" id="soundBtn">🔊 音ON</button>
       </div>
       <div id="question">「クイズ」を押してね</div>
-      <div id="message">Ver.5：タイムアタック・メダル・苦手卒業を追加。</div>
+      <div id="message">Ver.6：アニメーションと効果音を追加。</div>
       <div class="progressWrap">
         <div class="progressText" id="progressText">進み具合：未開始</div>
         <div class="progressBar"><div id="progressFill"></div></div>
@@ -204,6 +245,7 @@ let best47 = localStorage.getItem("tdfk5_best47") || "";
 let bestTime = localStorage.getItem("tdfk5_bestTime") || "";
 let medals = new Set(JSON.parse(localStorage.getItem("tdfk5_medals") || "[]"));
 let mapReady = false;
+let soundOn = localStorage.getItem("tdfk6_sound") !== "off";
 
 let challengeActive = false;
 let challengeSize = 0;
@@ -217,6 +259,69 @@ let timeAttack = false;
 const question = document.getElementById("question");
 const message = document.getElementById("message");
 const resultPanel = document.getElementById("resultPanel");
+
+
+function setSoundButton() {
+  const btn = document.getElementById("soundBtn");
+  if (btn) btn.textContent = soundOn ? "🔊 音ON" : "🔇 音OFF";
+}
+function beep(type) {
+  if (!soundOn) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    const gain = ctx.createGain();
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.16, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+
+    if (type === "ok") {
+      const o1 = ctx.createOscillator();
+      const o2 = ctx.createOscillator();
+      o1.type = "sine"; o2.type = "sine";
+      o1.frequency.setValueAtTime(660, now);
+      o2.frequency.setValueAtTime(880, now + 0.08);
+      o1.connect(gain); o2.connect(gain);
+      o1.start(now); o1.stop(now + 0.12);
+      o2.start(now + 0.08); o2.stop(now + 0.24);
+    } else if (type === "ng") {
+      const o = ctx.createOscillator();
+      o.type = "sawtooth";
+      o.frequency.setValueAtTime(220, now);
+      o.frequency.exponentialRampToValueAtTime(120, now + 0.22);
+      o.connect(gain);
+      o.start(now); o.stop(now + 0.24);
+    } else if (type === "finish") {
+      [523,659,784,1046].forEach((freq, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = "triangle";
+        o.frequency.setValueAtTime(freq, now + i*0.09);
+        g.gain.setValueAtTime(0.0001, now + i*0.09);
+        g.gain.exponentialRampToValueAtTime(0.13, now + i*0.09 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + i*0.09 + 0.18);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(now + i*0.09); o.stop(now + i*0.09 + 0.2);
+      });
+    }
+    setTimeout(() => ctx.close && ctx.close(), 700);
+  } catch (e) {}
+}
+function animateEl(el, className) {
+  if (!el) return;
+  el.classList.remove(className);
+  void el.offsetWidth;
+  el.classList.add(className);
+  setTimeout(() => el.classList.remove(className), 450);
+}
+function pulseButton(btn) {
+  if (!btn) return;
+  btn.classList.remove("pulse");
+  void btn.offsetWidth;
+  btn.classList.add("pulse");
+  setTimeout(() => btn.classList.remove("pulse"), 400);
+}
 
 function save() {
   localStorage.setItem("tdfk5_correct", String(correct));
@@ -417,6 +522,8 @@ function answer(code, el) {
       }
     }
     el.classList.add("correct");
+    animateEl(el, "pop");
+    beep("ok");
     message.textContent = "○ 正解！ 連続正解 " + streak + "！";
     message.className = "okText";
   } else {
@@ -424,8 +531,10 @@ function answer(code, el) {
     weak.add(currentCode);
     weakWins[currentCode] = 0;
     el.classList.add("wrong");
+    animateEl(el, "shake");
+    beep("ng");
     const answerEl = document.querySelector('.geolonia-svg-map .prefecture[data-code="' + Number(currentCode) + '"]');
-    if (answerEl) answerEl.classList.add("correct");
+    if (answerEl) { answerEl.classList.add("correct"); animateEl(answerEl, "pop"); }
     message.textContent = "× ここは「" + PREFS[code][0] + "」。正解は「" + PREFS[currentCode][0] + "」";
     message.className = "ngText";
   }
@@ -483,6 +592,7 @@ function finishChallenge() {
   document.getElementById("finishBadges").innerHTML = badges.map(b => '<span class="badge">'+b+'</span>').join("");
 
   document.getElementById("finishModal").classList.add("show");
+  beep("finish");
   confetti();
   challengeActive = false;
   timeAttack = false;
@@ -561,6 +671,14 @@ document.getElementById("region").addEventListener("change", () => {
   if (mode !== "learn") { mode = "quiz"; challengeActive = false; timeAttack = false; used = new Set(); stopTimer(); document.getElementById("timerText").textContent="";
   message.className = ""; clearMarks(); updateProgress(); pickQuestion(); }
 });
+document.getElementById("soundBtn").addEventListener("click", (ev) => {
+  soundOn = !soundOn;
+  localStorage.setItem("tdfk6_sound", soundOn ? "on" : "off");
+  setSoundButton();
+  pulseButton(ev.currentTarget);
+  if (soundOn) beep("ok");
+});
+
 document.getElementById("resetBtn").addEventListener("click", () => {
   if (confirm("記録を消しますか？")) {
     correct = 0; total = 0; weak = new Set(); weakWins = {}; used = new Set(); streak = 0; bestStreak = 0;
@@ -578,6 +696,7 @@ document.getElementById("closeFinish").addEventListener("click", () => {
 updateStats();
 updateProgress();
 renderList();
+setSoundButton();
 loadMap();
 </script>
 </body>
