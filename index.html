@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>日本地理マスター Ver.9.6</title>
+<title>日本地理マスター Ver.9.7</title>
 <style>
 :root {
   --main:#08a6a0; --main2:#6ed2cf; --bg:#eefafa; --card:#ffffff;
@@ -616,13 +616,14 @@ button.pulse {
 </style>
 </head>
 <body>
-<header><h1>👑 日本地理マスター Ver.9.6.1</h1></header>
+<header><h1>👑 日本地理マスター Ver.9.7.1</h1></header>
 <main>
   <section class="card topGrid">
     <div>
       <div class="controls">
         <button class="primary" id="prefModeBtn">🗾 都道府県</button>
         <button class="soft" id="capitalModeBtn">🏙 県庁所在地</button>
+        <button class="soft" id="hardCapitalBtn">🔥 難しい問題だけ OFF</button>
         <button class="soft" id="regionModeBtn">🧭 地方区分</button>
         <select id="region">
           <option>全国</option><option>北海道</option><option>東北</option><option>関東</option>
@@ -639,7 +640,7 @@ button.pulse {
         <button class="soft" id="bgmBtn">🎵 BGM OFF</button>
       </div>
       <div id="question">「クイズ」を押してね</div>
-      <div id="message">Ver.9.6：BGM機能を追加。</div>
+      <div id="message">Ver.9.7：県庁所在地モードに難問スイッチを追加。</div>
       <div class="progressWrap">
         <div class="progressText" id="progressText">進み具合：未開始</div>
         <div class="progressBar"><div id="progressFill"></div></div>
@@ -739,6 +740,7 @@ let mapReady = false;
 let pendingAnswer = null;
 let soundOn = localStorage.getItem("tdfk6_sound") !== "off";
 let bgmOn = localStorage.getItem("tdfk_bgm") === "on";
+let hardCapitalOnly = localStorage.getItem("tdfk_hard_capital") === "on";
 
 let challengeActive = false;
 let challengeSize = 0;
@@ -968,6 +970,28 @@ function startChallenge(size, timed=false) {
   if (timed) startTimer(); else { stopTimer(); document.getElementById("timerText").textContent = ""; }
   pickQuestion();
 }
+
+function normalizeCapitalName(name) {
+  return name.replace(/[都道府県市区町村]/g, "");
+}
+function isSameNameCapital(code) {
+  const data = PREFS[code];
+  return normalizeCapitalName(data[0]) === normalizeCapitalName(data[2]);
+}
+function getQuestionPool() {
+  let pool = filterCodes();
+  if (quizType === "capital" && hardCapitalOnly) {
+    pool = pool.filter(code => !isSameNameCapital(code));
+  }
+  return pool;
+}
+function setHardCapitalButton() {
+  const btn = document.getElementById("hardCapitalBtn");
+  if (!btn) return;
+  btn.textContent = hardCapitalOnly ? "🔥 難しい問題だけ ON" : "🔥 難しい問題だけ OFF";
+  btn.style.display = quizType === "capital" ? "inline-flex" : "none";
+}
+
 function pickQuestion() {
   if (!mapReady) {
     message.textContent = "地図を読み込み中です。少し待ってください。";
@@ -1017,7 +1041,7 @@ function pickQuestion() {
   const data = PREFS[currentCode];
   if (quizType === "capital") {
     question.textContent = "「" + data[2] + "」が県庁所在地なのはどこ？";
-    message.textContent = "ヒント：地方は「" + data[1] + "」";
+    message.textContent = "ヒント：地方は「" + data[1] + "」" + (hardCapitalOnly ? "／難しい問題だけ" : "");
   } else {
     question.textContent = "「" + data[0] + "」はどこ？";
     message.textContent = "ヒント：地方は「" + data[1] + "」／県庁所在地：" + data[2];
@@ -1307,6 +1331,7 @@ function renderList() {
     const add = weak.has(code) ? " 🧠" + (weakWins[code] ? " " + weakWins[code] + "/3" : "") : "";
 
     if (quizType === "capital") {
+      if (hardCapitalOnly && isSameNameCapital(code)) return;
       chip.textContent = data[2] + add;
     } else {
       chip.textContent = data[0] + add;
@@ -1330,6 +1355,7 @@ function setQuizType(type) {
     btn.classList.toggle("primary", type === val);
     btn.classList.toggle("soft", type !== val);
   });
+  setHardCapitalButton();
   renderList();
   const box = document.getElementById("answerListBox");
   const btn = document.getElementById("toggleListBtn");
@@ -1350,6 +1376,20 @@ function setQuizType(type) {
 }
 document.getElementById("prefModeBtn").addEventListener("click", () => setQuizType("prefecture"));
 document.getElementById("capitalModeBtn").addEventListener("click", () => setQuizType("capital"));
+
+document.getElementById("hardCapitalBtn").addEventListener("click", (ev) => {
+  hardCapitalOnly = !hardCapitalOnly;
+  localStorage.setItem("tdfk_hard_capital", hardCapitalOnly ? "on" : "off");
+  setHardCapitalButton();
+  pulseButton(ev.currentTarget);
+  if (quizType === "capital" && mode !== "learn") {
+    used = new Set();
+    clearMarks();
+    resultPanel.classList.remove("show");
+    pickQuestion();
+  }
+});
+
 document.getElementById("regionModeBtn").addEventListener("click", () => setQuizType("region"));
 
 document.getElementById("startBtn").addEventListener("click", () => {
@@ -1498,6 +1538,7 @@ updateProgress();
 renderList();
 setSoundButton();
 setQuizType("prefecture");
+setHardCapitalButton();
 loadMap();
 </script>
 <audio id="bgmAudio" src="bgm.mp3" loop preload="auto"></audio>
