@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>日本地理マスター Ver.9.4</title>
+<title>日本地理マスター Ver.9.5</title>
 <style>
 :root {
   --main:#08a6a0; --main2:#6ed2cf; --bg:#eefafa; --card:#ffffff;
@@ -582,7 +582,6 @@ button.pulse {
     min-width:1000px;
   }
   .resultPanel {
-    display:block;
     left:auto;
     right:8px;
     bottom:8px;
@@ -605,10 +604,19 @@ button.pulse {
   }
 }
 
+
+/* Ver9.5: result panel must be hidden unless .show is present */
+.resultPanel:not(.show) {
+  display:none !important;
+}
+.mobileConfirm:not(.show) {
+  display:none !important;
+}
+
 </style>
 </head>
 <body>
-<header><h1>👑 日本地理マスター Ver.9.4.1</h1></header>
+<header><h1>👑 日本地理マスター Ver.9.5.1</h1></header>
 <main>
   <section class="card topGrid">
     <div>
@@ -630,7 +638,7 @@ button.pulse {
         <button class="soft" id="soundBtn">🔊 音ON</button>
       </div>
       <div id="question">「クイズ」を押してね</div>
-      <div id="message">Ver.9.4：タブレット表示を調整。</div>
+      <div id="message">Ver.9.5：結果パネル表示を修正。</div>
       <div class="progressWrap">
         <div class="progressText" id="progressText">進み具合：未開始</div>
         <div class="progressBar"><div id="progressFill"></div></div>
