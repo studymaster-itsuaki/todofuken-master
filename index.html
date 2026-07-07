@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>日本地理マスター Ver.9.5</title>
+<title>日本地理マスター Ver.9.6</title>
 <style>
 :root {
   --main:#08a6a0; --main2:#6ed2cf; --bg:#eefafa; --card:#ffffff;
@@ -616,7 +616,7 @@ button.pulse {
 </style>
 </head>
 <body>
-<header><h1>👑 日本地理マスター Ver.9.5.1</h1></header>
+<header><h1>👑 日本地理マスター Ver.9.6.1</h1></header>
 <main>
   <section class="card topGrid">
     <div>
@@ -636,9 +636,10 @@ button.pulse {
         <button class="soft" id="weakBtn">🧠 苦手</button>
         <button class="danger" id="resetBtn">記録リセット</button>
         <button class="soft" id="soundBtn">🔊 音ON</button>
+        <button class="soft" id="bgmBtn">🎵 BGM OFF</button>
       </div>
       <div id="question">「クイズ」を押してね</div>
-      <div id="message">Ver.9.5：結果パネル表示を修正。</div>
+      <div id="message">Ver.9.6：BGM機能を追加。</div>
       <div class="progressWrap">
         <div class="progressText" id="progressText">進み具合：未開始</div>
         <div class="progressBar"><div id="progressFill"></div></div>
@@ -737,6 +738,7 @@ let medals = new Set(JSON.parse(localStorage.getItem("tdfk5_medals") || "[]"));
 let mapReady = false;
 let pendingAnswer = null;
 let soundOn = localStorage.getItem("tdfk6_sound") !== "off";
+let bgmOn = localStorage.getItem("tdfk_bgm") === "on";
 
 let challengeActive = false;
 let challengeSize = 0;
@@ -773,6 +775,28 @@ function setSoundButton() {
   const btn = document.getElementById("soundBtn");
   if (btn) btn.textContent = soundOn ? "🔊 音ON" : "🔇 音OFF";
 }
+
+function setBgmButton() {
+  const btn = document.getElementById("bgmBtn");
+  if (btn) btn.textContent = bgmOn ? "🎵 BGM ON" : "🎵 BGM OFF";
+}
+function applyBgmState() {
+  const audio = document.getElementById("bgmAudio");
+  if (!audio) return;
+  audio.volume = 0.18;
+  setBgmButton();
+  if (bgmOn) {
+    audio.play().catch(() => {});
+  } else {
+    audio.pause();
+  }
+}
+function toggleBgm() {
+  bgmOn = !bgmOn;
+  localStorage.setItem("tdfk_bgm", bgmOn ? "on" : "off");
+  applyBgmState();
+}
+
 function beep(type) {
   if (!soundOn) return;
   try {
@@ -1359,6 +1383,12 @@ document.getElementById("soundBtn").addEventListener("click", (ev) => {
   if (soundOn) beep("ok");
 });
 
+document.getElementById("bgmBtn").addEventListener("click", (ev) => {
+  toggleBgm();
+  pulseButton(ev.currentTarget);
+});
+
+
 document.getElementById("resetBtn").addEventListener("click", () => {
   if (confirm("記録を消しますか？")) {
     correct = 0; total = 0; weak = new Set(); weakWins = {}; used = new Set(); streak = 0; bestStreak = 0;
@@ -1470,5 +1500,6 @@ setSoundButton();
 setQuizType("prefecture");
 loadMap();
 </script>
+<audio id="bgmAudio" src="bgm.mp3" loop preload="auto"></audio>
 </body>
 </html>
