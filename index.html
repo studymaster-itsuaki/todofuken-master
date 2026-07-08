@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>日本地理マスター Ver.9.9</title>
+<title>日本地理マスター Ver.10.0</title>
 <style>
 :root {
   --main:#08a6a0; --main2:#6ed2cf; --bg:#eefafa; --card:#ffffff;
@@ -616,7 +616,7 @@ button.pulse {
 </style>
 </head>
 <body>
-<header><h1>👑 日本地理マスター Ver.9.9.1</h1></header>
+<header><h1>👑 日本地理マスター Ver.10.0.1</h1></header>
 <main>
   <section class="card topGrid">
     <div>
@@ -640,7 +640,7 @@ button.pulse {
         <button class="soft" id="bgmBtn">🎵 BGM OFF</button>
       </div>
       <div id="question">「クイズ」を押してね</div>
-      <div id="message">Ver.9.9：暗記問題のみ除外処理を再修正。</div>
+      <div id="message">Ver.10.0：暗記問題のみ除外を完成。</div>
       <div class="progressWrap">
         <div class="progressText" id="progressText">進み具合：未開始</div>
         <div class="progressBar"><div id="progressFill"></div></div>
@@ -964,6 +964,7 @@ function startChallenge(size, timed=false) {
   resultPanel.classList.remove("show");
   let base = getBasePool();
   if (size === 47) base = Object.keys(PREFS);
+  base = filterHardCapitalPool(base);
   challengePool = shuffle(base).slice(0, Math.min(size, base.length));
   challengeSize = challengePool.length;
   updateProgress();
@@ -974,16 +975,15 @@ function startChallenge(size, timed=false) {
 
 
 const SAME_NAME_CAPITAL_CODES = new Set([
-  "05","06","07","08","10","11","12","13","16","18","20","21","22","24","26","29","30","31","32","33","34","35","36","39","40","41","44","45","46","47"
+  "05","06","07","12","15","16","18","20","21","22","26","27","29","30","31","33","34","35","36","39","40","41","42","43","44","45","46"
 ]);
 
 function isSameNameCapital(code) {
   return SAME_NAME_CAPITAL_CODES.has(String(code).padStart(2, "0"));
 }
-function getQuestionPool() {
-  let pool = getQuestionPool();
+function filterHardCapitalPool(pool) {
   if (quizType === "capital" && hardCapitalOnly) {
-    pool = pool.filter(code => !isSameNameCapital(code));
+    return pool.filter(code => !isSameNameCapital(code));
   }
   return pool;
 }
@@ -993,7 +993,6 @@ function setHardCapitalButton() {
   btn.textContent = hardCapitalOnly ? "🔥 暗記問題のみ ON" : "🔥 暗記問題のみ OFF";
   btn.style.display = quizType === "capital" ? "inline-flex" : "none";
 }
-
 function pickQuestion() {
   if (!mapReady) {
     message.textContent = "地図を読み込み中です。少し待ってください。";
@@ -1011,7 +1010,7 @@ function pickQuestion() {
       return;
     }
   } else {
-    pool = getBasePool();
+    pool = filterHardCapitalPool(getBasePool());
     if (!pool.length) {
       currentCode = null;
       question.textContent = mode === "weak" ? "苦手県はまだありません" : "問題がありません";
@@ -1027,6 +1026,11 @@ function pickQuestion() {
   }
 
   currentCode = pool[Math.floor(Math.random() * pool.length)];
+  // Safety: never ask same-name capital questions when memorization-only is ON.
+  if (quizType === "capital" && hardCapitalOnly && isSameNameCapital(currentCode)) {
+    used.add(currentCode);
+    return pickQuestion();
+  }
   used.add(currentCode);
   if (quizType === "region") {
     currentRegion = REGIONS[Math.floor(Math.random() * REGIONS.length)];
@@ -1357,8 +1361,6 @@ function setQuizType(type) {
     btn.classList.toggle("primary", type === val);
     btn.classList.toggle("soft", type !== val);
   });
-  setHardCapitalButton();
-  setHardCapitalButton();
   setHardCapitalButton();
   renderList();
   const box = document.getElementById("answerListBox");
